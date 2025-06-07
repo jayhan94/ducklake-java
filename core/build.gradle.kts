@@ -30,9 +30,10 @@ dependencies {
     // jdbi
     implementation("org.jdbi:jdbi3-core:3.49.4")
     implementation("org.jdbi:jdbi3-jpa:3.49.4")
-
-    // JPA
+    implementation("org.jdbi:jdbi3-sqlobject:3.49.4")
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+    // connection pool
+    implementation("com.zaxxer:HikariCP:6.2.1")
 
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")

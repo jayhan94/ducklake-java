@@ -2,16 +2,16 @@ package io.github.jayhan94.ducklake.impl;
 
 import io.github.jayhan94.ducklake.api.Catalog;
 import io.github.jayhan94.ducklake.api.Table;
+import io.github.jayhan94.ducklake.duckdb.DuckDB;
 import io.github.jayhan94.ducklake.type.Schema;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.duckdb.DuckDBConnection;
-
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class DuckLakeCatalog implements AutoCloseable, Catalog {
+    private static final Logger logger = LoggerFactory.getLogger(DuckLakeCatalog.class);
+
     @Getter
     protected String catalogName;
     protected String address;
@@ -19,7 +19,7 @@ public abstract class DuckLakeCatalog implements AutoCloseable, Catalog {
     protected String username;
     protected String password;
     protected String dataPath;
-    private DuckDBConnection conn;
+    protected DuckDB duckdb;
 
     public DuckLakeCatalog(String catalogName,
                            String address,
@@ -35,23 +35,33 @@ public abstract class DuckLakeCatalog implements AutoCloseable, Catalog {
         this.dataPath = dataPath;
     }
 
+    /**
+     * Create DuckDB connection using the custom DuckDB class
+     */
     @SneakyThrows
     private void createConnection() {
-        conn = DuckDBConnection.newConnection("jdbc:duckdb:", false, new Properties());
+        duckdb = new DuckDB();
     }
 
-    @SneakyThrows
-    protected ResultSet executeQuery(String query) {
-        try (Statement stmt = conn.createStatement()) {
-            return stmt.executeQuery(query);
+    /**
+     * Execute query and return single result
+     */
+    protected <T> T queryOne(String query, Class<T> resultType) {
+        if (duckdb == null) {
+            throw new IllegalStateException("DuckDB connection not initialized");
         }
+        return duckdb.queryOne(query, resultType);
     }
 
-    @SneakyThrows
-    protected boolean execute(String sql) {
-        try (Statement stmt = conn.createStatement()) {
-            return stmt.execute(sql);
+    /**
+     * Execute SQL statement (DDL/DML)
+     */
+    protected void execute(String sql) {
+        if (duckdb == null) {
+            throw new IllegalStateException("DuckDB connection not initialized");
         }
+        duckdb.execute(sql);
+        logger.debug("Executed SQL: {}", sql);
     }
 
     protected abstract void installPlugins();
@@ -62,13 +72,15 @@ public abstract class DuckLakeCatalog implements AutoCloseable, Catalog {
         createConnection();
         installPlugins();
         attach();
+        logger.info("DuckLake catalog '{}' initialized successfully", catalogName);
     }
 
     @Override
     @SneakyThrows
     public void close() {
-        if (conn != null && !conn.isClosed()) {
-            conn.close();
+        if (duckdb != null && !duckdb.isClosed()) {
+            duckdb.close();
+            logger.info("DuckDB connection closed for catalog: {}", catalogName);
         }
     }
 
