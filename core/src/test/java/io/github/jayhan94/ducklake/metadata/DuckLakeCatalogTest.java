@@ -1,9 +1,10 @@
 package io.github.jayhan94.ducklake.metadata;
 
-import io.github.jayhan94.ducklake.metadata.impl.DuckDBCatalogImpl;
-import io.github.jayhan94.ducklake.metadata.impl.MySQLCatalogImpl;
-import io.github.jayhan94.ducklake.metadata.impl.PGCatalogImpl;
-import io.github.jayhan94.ducklake.metadata.impl.SqliteCatalogImpl;
+import io.github.jayhan94.ducklake.impl.DuckLakeCatalog;
+import io.github.jayhan94.ducklake.impl.catalogs.DuckDBCatalogImpl;
+import io.github.jayhan94.ducklake.impl.catalogs.MySQLCatalogImpl;
+import io.github.jayhan94.ducklake.impl.catalogs.PGCatalogImpl;
+import io.github.jayhan94.ducklake.impl.catalogs.SqliteCatalogImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

@@ -16,18 +16,31 @@ repositories {
 }
 
 dependencies {
-    implementation("org.duckdb:duckdb_jdbc:1.3.0.0")
+    // log4j
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("org.apache.logging.log4j:log4j-core:2.22.0")
     implementation("org.apache.logging.log4j:log4j-api:2.22.0")
     implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.0")
+
     implementation(libs.guava)
+
+    // duckdb
+    implementation("org.duckdb:duckdb_jdbc:1.3.0.0")
+
+    // jdbi
+    implementation("org.jdbi:jdbi3-core:3.49.4")
+    implementation("org.jdbi:jdbi3-jpa:3.49.4")
+
+    // JPA
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
-    // Use JUnit test framework.
-    testImplementation(libs.junit)
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
+
+    // tests
+    testImplementation(libs.junit)
     testImplementation("org.postgresql:postgresql:42.7.3")
     testImplementation("org.testcontainers:postgresql:1.19.8")
     testImplementation("com.mysql:mysql-connector-j:9.3.0")
