@@ -1,23 +1,23 @@
 package io.github.jayhan94.ducklake.api;
 
-import io.github.jayhan94.ducklake.type.Schema;
+import io.github.jayhan94.ducklake.TableSchema;
 
+/**
+ * Table is a view of the table at a specific snapshot
+ */
 public interface Table {
-    String id();
+    Long id();
 
     String tableName();
 
+    TableSchema tableSchema();
+
+    // get the snapshot of the table
+    Snapshot snapshot();
+
     Schema schema();
 
-    Snapshot currentSnapshot();
+    Scan scan();
 
-    Snapshot snapshot(long snapshotId);
-
-    Scan scan(long snapshotId);
-
-    Statistics statistics(long snapshotId);
-
-    Append newAppend(DataFile dataFile);
-
-    void refresh();
+    Statistics statistics();
 }

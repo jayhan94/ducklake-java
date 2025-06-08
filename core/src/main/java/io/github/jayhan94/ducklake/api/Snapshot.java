@@ -3,9 +3,11 @@ package io.github.jayhan94.ducklake.api;
 public interface Snapshot {
     long id();
 
-    long createTimestamp();
+    long timestamp();
 
-    DataFiles dataFiles();
+    long schemaVersion();
 
-    DeleteFiles deleteFiles();
+    DataFiles tableDataFiles(long tableId);
+
+    DeleteFiles tableDeleteFiles(long tableId);
 }

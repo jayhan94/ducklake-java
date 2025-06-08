@@ -1,8 +1,16 @@
-package io.github.jayhan94.ducklake.duckdb;
+package io.github.jayhan94.ducklake.catalog.duckdb;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import io.github.jayhan94.ducklake.catalog.sql.SQLTransaction;
+import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
+import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
+import io.github.jayhan94.ducklake.entity.DuckLakeTable;
+
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.jpa.JpaMapperFactory;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,14 +22,15 @@ import java.util.List;
  * DuckDB connection management class
  * Uses HikariCP connection pool for connection management
  */
-public class DuckDB implements Closeable {
+public class DuckDB implements Closeable, SQLTransaction {
     private static final Logger logger = LoggerFactory.getLogger(DuckDB.class);
 
-    private final Jdbi duckdb;
+    private final Jdbi jdbi;
     private final HikariDataSource dataSource;
 
     /**
-     * Create an in-memory DuckDB instance with default connection pool configuration
+     * Create an in-memory DuckDB instance with default connection pool
+     * configuration
      */
     public DuckDB() {
         this(null, createDefaultConfig());
@@ -53,7 +62,9 @@ public class DuckDB implements Closeable {
         config.setDriverClassName("org.duckdb.DuckDBDriver");
 
         this.dataSource = new HikariDataSource(config);
-        this.duckdb = Jdbi.create(dataSource);
+        this.jdbi = Jdbi.create(dataSource)
+                .registerRowMapper(new JpaMapperFactory())
+                .installPlugin(new SqlObjectPlugin());
     }
 
     /**
@@ -86,7 +97,7 @@ public class DuckDB implements Closeable {
      * connection recycling
      */
     public <T> T queryOne(String sql, Class<T> clazz) {
-        return duckdb.withHandle(handle -> {
+        return jdbi.withHandle(handle -> {
             // Inside this lambda, connections are automatically managed
             // Connections will be properly closed regardless of exceptions
             return handle.createQuery(sql).mapTo(clazz).one();
@@ -98,7 +109,7 @@ public class DuckDB implements Closeable {
      * Also uses withHandle to ensure automatic connection recycling
      */
     public <T> List<T> query(String sql, Class<T> clazz) {
-        return duckdb.withHandle(handle -> handle.createQuery(sql).mapTo(clazz).list());
+        return jdbi.withHandle(handle -> handle.createQuery(sql).mapTo(clazz).list());
     }
 
     /**
@@ -106,7 +117,7 @@ public class DuckDB implements Closeable {
      * Uses withHandle to ensure connection recycling
      */
     public void execute(String sql) {
-        duckdb.withHandle(handle -> {
+        jdbi.withHandle(handle -> {
             handle.execute(sql);
             return null; // withHandle requires return value
         });
@@ -118,11 +129,11 @@ public class DuckDB implements Closeable {
     public String getPoolStatus() {
         if (dataSource != null && !dataSource.isClosed()) {
             return String.format("Pool[%s] - Active: %d, Idle: %d, Total: %d, Waiting: %d",
-                                 dataSource.getPoolName(),
-                                 dataSource.getHikariPoolMXBean().getActiveConnections(),
-                                 dataSource.getHikariPoolMXBean().getIdleConnections(),
-                                 dataSource.getHikariPoolMXBean().getTotalConnections(),
-                                 dataSource.getHikariPoolMXBean().getThreadsAwaitingConnection());
+                    dataSource.getPoolName(),
+                    dataSource.getHikariPoolMXBean().getActiveConnections(),
+                    dataSource.getHikariPoolMXBean().getIdleConnections(),
+                    dataSource.getHikariPoolMXBean().getTotalConnections(),
+                    dataSource.getHikariPoolMXBean().getThreadsAwaitingConnection());
         }
         return "Pool is closed or not initialized";
     }
@@ -150,5 +161,35 @@ public class DuckDB implements Closeable {
                 throw new IOException("Error occurred while closing connection pool", e);
             }
         }
+    }
+
+    /**
+     * ==============================================
+     * SQL Transaction Related Methods
+     * ==============================================
+     */
+    @Override
+    public DuckLakeSnapshot getLatestSnapshot() {
+        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.getLatestSnapshot());
+    }
+
+    @Override
+    public DuckLakeSnapshot getSnapshot(long snapshotId) {
+        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.getSnapshot(snapshotId));
+    }
+
+    @Override
+    public DuckLakeSchema getSchema(long snapshotId) {
+        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.getSchema(snapshotId));
+    }
+
+    @Override
+    public DuckLakeTable getTable(long snapshotId, long schemaId, String tableName) {
+        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.getTable(snapshotId, schemaId, tableName));
+    }
+
+    @Override
+    public boolean createTable(DuckLakeTable duckLakeTable) {
+        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.createTable(duckLakeTable));
     }
 }

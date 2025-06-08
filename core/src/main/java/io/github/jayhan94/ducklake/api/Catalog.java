@@ -1,13 +1,16 @@
 package io.github.jayhan94.ducklake.api;
 
-import io.github.jayhan94.ducklake.type.Schema;
+import java.util.List;
+
+import io.github.jayhan94.ducklake.TableSchema;
 
 public interface Catalog {
-    Table getTable(String tableName);
+    // pass null if you want to get the latest snapshot
+    Snapshot getSnapshot(Long snapshotId);
 
-    Table createTable(String tableName, Schema schema);
+    List<Schema> listSchemas(Long snapshotId);
 
-    Table updateTableSchema(String tableName, Schema schema);
+    Table getTable(Long snapshotId, Long schemaId, String tableName);
 
-    Table deleteTable(String tableName);
+    Table createTable(String schemaName, String tableName, TableSchema schema);
 }
