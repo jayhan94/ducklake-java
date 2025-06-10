@@ -1,6 +1,9 @@
 # ducklake-java
 A java implementation of [ducklake](https://ducklake.select/).
 
+# Java version
+Java 17 or above is required.
+
 # examples
 ## Snapshot
 ```java
