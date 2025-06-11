@@ -1,6 +1,8 @@
 package io.github.jayhan94.ducklake.examples;
 
 import io.github.jayhan94.ducklake.api.Snapshot;
+import io.github.jayhan94.ducklake.api.Table;
+import io.github.jayhan94.ducklake.api.Table.TableIdentifier;
 import io.github.jayhan94.ducklake.catalog.BaseMetadataCatalog;
 import io.github.jayhan94.ducklake.catalog.PostgresMetadataCatalogImpl;
 
@@ -25,10 +27,18 @@ public class CatalogExample {
         // After initializing, the catalog will be ready to use. You can query the metadata tables from the postgres instance.
         catalog.initialize();
         Snapshot snapshot = catalog.getSnapshot(null);
+        System.out.println("--------------------------------");
         System.out.println("snapshot info");
-        System.out.println(snapshot.id());
-        System.out.println(snapshot.timestamp());
-        System.out.println(snapshot.schemaVersion());
+        System.out.println("snapshot id: " + snapshot.id());
+        System.out.println("snapshot timestamp: " + snapshot.timestamp());
+        System.out.println("snapshot schema version: " + snapshot.schemaVersion());
+        System.out.println("--------------------------------");
+        System.out.println("table info");
+        Table table = catalog.getTable(snapshot.id(), new TableIdentifier("a"));
+        System.out.println("table id: " + table.tableId());
+        System.out.println("table name: " + table.tableName());
+        System.out.println("table schema: " + table.tableSchema().prettyString());
+        System.out.println("--------------------------------");
         catalog.close();
     }
 }

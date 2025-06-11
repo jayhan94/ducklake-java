@@ -1,9 +1,11 @@
 package io.github.jayhan94.ducklake.catalog.duckdb;
 
+import com.google.common.base.Function;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import io.github.jayhan94.ducklake.catalog.sql.SQLTransaction;
+import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
@@ -22,8 +24,8 @@ import java.util.List;
  * DuckDB connection management class
  * Uses HikariCP connection pool for connection management
  */
-public class DuckDB implements Closeable, SQLTransaction {
-    private static final Logger logger = LoggerFactory.getLogger(DuckDB.class);
+public class CatalogDuckDB implements Closeable, SQLTransaction {
+    private static final Logger logger = LoggerFactory.getLogger(CatalogDuckDB.class);
 
     private final Jdbi jdbi;
     private final HikariDataSource dataSource;
@@ -32,7 +34,7 @@ public class DuckDB implements Closeable, SQLTransaction {
      * Create an in-memory DuckDB instance with default connection pool
      * configuration
      */
-    public DuckDB() {
+    public CatalogDuckDB() {
         this(null, createDefaultConfig());
     }
 
@@ -41,7 +43,7 @@ public class DuckDB implements Closeable, SQLTransaction {
      *
      * @param file DuckDB database file path
      */
-    public DuckDB(String file) {
+    public CatalogDuckDB(String file) {
         this(file, createDefaultConfig());
     }
 
@@ -51,7 +53,7 @@ public class DuckDB implements Closeable, SQLTransaction {
      * @param file   DuckDB database file path
      * @param config HikariCP configuration
      */
-    public DuckDB(String file, HikariConfig config) {
+    public CatalogDuckDB(String file, HikariConfig config) {
         if (file == null) {
             file = "";
         }
@@ -102,14 +104,6 @@ public class DuckDB implements Closeable, SQLTransaction {
             // Connections will be properly closed regardless of exceptions
             return handle.createQuery(sql).mapTo(clazz).one();
         });
-    }
-
-    /**
-     * Query multiple results
-     * Also uses withHandle to ensure automatic connection recycling
-     */
-    public <T> List<T> query(String sql, Class<T> clazz) {
-        return jdbi.withHandle(handle -> handle.createQuery(sql).mapTo(clazz).list());
     }
 
     /**
@@ -168,28 +162,42 @@ public class DuckDB implements Closeable, SQLTransaction {
      * SQL Transaction Related Methods
      * ==============================================
      */
+    private <T> T withTransaction(Function<SQLTransaction, T> transaction) {
+        return jdbi.withExtension(SQLTransaction.class, dao -> transaction.apply(dao));
+    }
+
     @Override
     public DuckLakeSnapshot getLatestSnapshot() {
-        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.getLatestSnapshot());
+        return withTransaction(transaction -> transaction.getLatestSnapshot());
     }
 
     @Override
     public DuckLakeSnapshot getSnapshot(long snapshotId) {
-        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.getSnapshot(snapshotId));
+        return withTransaction(transaction -> transaction.getSnapshot(snapshotId));
     }
 
     @Override
-    public DuckLakeSchema getSchema(long snapshotId) {
-        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.getSchema(snapshotId));
+    public List<DuckLakeSchema> listSchemas(long snapshotId) {
+        return withTransaction(transaction -> transaction.listSchemas(snapshotId));
+    }
+
+    @Override
+    public DuckLakeSchema getSchema(long snapshotId, String schemaName) {
+        return withTransaction(transaction -> transaction.getSchema(snapshotId, schemaName));
     }
 
     @Override
     public DuckLakeTable getTable(long snapshotId, long schemaId, String tableName) {
-        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.getTable(snapshotId, schemaId, tableName));
+        return withTransaction(transaction -> transaction.getTable(snapshotId, schemaId, tableName));
     }
 
     @Override
     public boolean createTable(DuckLakeTable duckLakeTable) {
-        return jdbi.withExtension(SQLTransaction.class, transaction -> transaction.createTable(duckLakeTable));
+        return withTransaction(transaction -> transaction.createTable(duckLakeTable));
+    }
+
+    @Override
+    public List<DuckLakeColumn> getTableColumns(long snapshotId, long tableId) {
+        return withTransaction(transaction -> transaction.getTableColumns(snapshotId, tableId));
     }
 }

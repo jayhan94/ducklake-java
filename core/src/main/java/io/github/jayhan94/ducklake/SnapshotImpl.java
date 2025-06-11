@@ -1,34 +1,38 @@
 package io.github.jayhan94.ducklake;
 
+import io.github.jayhan94.ducklake.api.Snapshot;
+import lombok.ToString;
+
+import java.io.Serializable;
+
 import io.github.jayhan94.ducklake.api.DataFiles;
 import io.github.jayhan94.ducklake.api.DeleteFiles;
-import io.github.jayhan94.ducklake.api.Snapshot;
-import io.github.jayhan94.ducklake.catalog.duckdb.DuckDB;
-import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 
-public class SnapshotImpl implements Snapshot {
-    private final DuckLakeSnapshot duckLakeSnapshot;
-    private final DuckDB duckdb;
+@ToString
+public class SnapshotImpl implements Snapshot, Serializable {
+    private final long snapshotId;
+    private final long timestamp;
+    private final long schemaVersion;
 
-    public SnapshotImpl(DuckDB duckdb,
-                        DuckLakeSnapshot duckLakeSnapshot) {
-        this.duckLakeSnapshot = duckLakeSnapshot;
-        this.duckdb = duckdb;
+    public SnapshotImpl(long snapshotId, long timestamp, long schemaVersion) {
+        this.snapshotId = snapshotId;
+        this.timestamp = timestamp;
+        this.schemaVersion = schemaVersion;
     }
 
     @Override
     public long id() {
-        return duckLakeSnapshot.getSnapshotId();
+        return snapshotId;
     }
 
     @Override
     public long timestamp() {
-        return duckLakeSnapshot.getSnapshotTime().toEpochMilli();
+        return timestamp;
     }
 
     @Override
     public long schemaVersion() {
-        return duckLakeSnapshot.getSchemaVersion();
+        return schemaVersion;
     }
 
     @Override
