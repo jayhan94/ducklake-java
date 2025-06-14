@@ -1,4 +1,4 @@
-package io.github.jayhan94.ducklake.catalog.sql;
+package io.github.jayhan94.ducklake.catalog.duckdb.sql;
 
 import java.util.List;
 
@@ -8,6 +8,8 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
+import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
+import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
@@ -92,6 +94,13 @@ public interface SQLTransaction {
             """)
     boolean createTable(@BindBean DuckLakeTable duckLakeTable);
 
+    /**
+     * Get all column information for a specific snapshot and table ID
+     * 
+     * @param snapshotId snapshot ID
+     * @param tableId table ID
+     * @return list of column information
+     */
     @SqlQuery("""
             SELECT column_id, begin_snapshot, end_snapshot, table_id, column_order, column_name, column_type, initial_default, default_value, nulls_allowed, parent_column
             FROM ducklake_column
@@ -102,4 +111,35 @@ public interface SQLTransaction {
             """)
     List<DuckLakeColumn> getTableColumns(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
 
+    /**
+     * Get all data file information for a specific snapshot and table ID
+     * 
+     * @param snapshotId snapshot ID
+     * @param tableId table ID
+     * @return list of data file information
+     */
+    @SqlQuery("""
+            SELECT data_file_id, table_id, begin_snapshot, end_snapshot, file_order, path, path_is_relative, file_format, record_count, file_size_bytes, footer_size, row_id_start, partition_id, encryption_key, partial_file_info
+            FROM ducklake_data_file
+            WHERE table_id = :tableId
+            AND begin_snapshot <= :snapshotId
+            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
+            """)
+    List<DuckLakeDataFile> getTableDataFiles(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
+
+    /**
+     * Get all delete files for a specific table at a snapshot
+     * 
+     * @param snapshotId snapshot ID
+     * @param tableId table ID
+     * @return list of delete files
+     */
+    @SqlQuery("""
+            SELECT delete_file_id, table_id, begin_snapshot, end_snapshot, data_file_id, path, path_is_relative, format, delete_count, file_size_bytes, footer_size, encryption_key
+            FROM ducklake_delete_file
+            WHERE table_id = :tableId
+            AND begin_snapshot <= :snapshotId
+            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
+            """)
+    List<DuckLakeDeleteFile> getTableDeleteFiles(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
 }

@@ -8,6 +8,4 @@ public interface Scan {
     Table table();
 
     DataFiles dataFiles();
-
-    DeleteFiles deleteFiles();
 }

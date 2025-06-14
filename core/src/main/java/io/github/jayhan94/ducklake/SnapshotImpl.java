@@ -1,12 +1,10 @@
 package io.github.jayhan94.ducklake;
 
+import io.github.jayhan94.ducklake.api.DataFiles;
 import io.github.jayhan94.ducklake.api.Snapshot;
 import lombok.ToString;
 
 import java.io.Serializable;
-
-import io.github.jayhan94.ducklake.api.DataFiles;
-import io.github.jayhan94.ducklake.api.DeleteFiles;
 
 @ToString
 public class SnapshotImpl implements Snapshot, Serializable {
@@ -33,15 +31,5 @@ public class SnapshotImpl implements Snapshot, Serializable {
     @Override
     public long schemaVersion() {
         return schemaVersion;
-    }
-
-    @Override
-    public DataFiles tableDataFiles(long tableId) {
-        return null;
-    }
-
-    @Override
-    public DeleteFiles tableDeleteFiles(long tableId) {
-        return null;
     }
 }

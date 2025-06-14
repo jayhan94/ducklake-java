@@ -78,13 +78,4 @@ public interface Catalog {
      * @return the data files
      */
     DataFiles getTableDataFiles(long snapshotId, long tableId);
-
-    /**
-     * Get the delete files of a table
-     * 
-     * @param snapshotId snapshot ID
-     * @param tableName  table name
-     * @return the delete files
-     */
-    DeleteFiles getTableDeleteFiles(long snapshotId, long tableId);
 }

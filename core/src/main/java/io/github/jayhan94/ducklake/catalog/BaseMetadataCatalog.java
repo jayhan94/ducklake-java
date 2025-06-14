@@ -1,13 +1,18 @@
 package io.github.jayhan94.ducklake.catalog;
 
+import io.github.jayhan94.ducklake.DataFileImpl;
+import io.github.jayhan94.ducklake.DataFilesImpl;
+import io.github.jayhan94.ducklake.DeleteFileImpl;
 import io.github.jayhan94.ducklake.SchemaImpl;
 import io.github.jayhan94.ducklake.SnapshotImpl;
 import io.github.jayhan94.ducklake.TableColumnImpl;
 import io.github.jayhan94.ducklake.TableImpl;
 import io.github.jayhan94.ducklake.TableSchemaImpl;
 import io.github.jayhan94.ducklake.api.Catalog;
+import io.github.jayhan94.ducklake.api.DataFile;
 import io.github.jayhan94.ducklake.api.DataFiles;
-import io.github.jayhan94.ducklake.api.DeleteFiles;
+import io.github.jayhan94.ducklake.api.DeleteFile;
+import io.github.jayhan94.ducklake.api.FileFormat;
 import io.github.jayhan94.ducklake.api.Schema;
 import io.github.jayhan94.ducklake.api.Snapshot;
 import io.github.jayhan94.ducklake.api.Table;
@@ -20,6 +25,8 @@ import io.github.jayhan94.ducklake.datatype.DataType;
 import io.github.jayhan94.ducklake.datatype.DataTypes;
 import io.github.jayhan94.ducklake.datatype.StructType;
 import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
+import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
+import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
@@ -50,7 +57,8 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
     protected String dataPath;
     protected CatalogDuckDB catalogdb;
 
-    public BaseMetadataCatalog(String catalogName,
+    public BaseMetadataCatalog(
+            String catalogName,
             String address,
             Integer port,
             String username,
@@ -172,10 +180,12 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
         // Get table columns
         TableSchema tableSchema = getTableSchema(snapshotId, tableId);
 
+        DataFiles dataFiles = getTableDataFiles(snapshotId, tableId);
+
         // TODO Get table statistics
         TableStatistics tableStatistics = null;
 
-        return new TableImpl(snapshot, schema, tableId, tableName, tableSchema, tableStatistics);
+        return new TableImpl(snapshot, schema, tableId, tableName, tableSchema, dataFiles, tableStatistics);
     }
 
     @Override
@@ -274,13 +284,40 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
 
     @Override
     public DataFiles getTableDataFiles(long snapshotId, long tableId) {
-        // TODO: implement this
-        return null;
-    }
+        List<DuckLakeDataFile> dataFilesEntity = catalogdb.getTableDataFiles(snapshotId, tableId);
+        List<DuckLakeDeleteFile> deleteFilesEntity = catalogdb.getTableDeleteFiles(snapshotId, tableId);
+        Map<Long, DuckLakeDeleteFile> dataFileToDeleteFile = deleteFilesEntity.stream()
+                .collect(Collectors.toMap(
+                        DuckLakeDeleteFile::getDataFileId,
+                        deleteFile -> deleteFile,
+                        (existing, replacement) -> {
+                            throw new IllegalStateException(
+                                    "Each data file should have only one delete file, found duplicate data file ID: "
+                                            + existing.getDataFileId());
+                        }));
+        List<DataFile> dataFiles = new ArrayList<>(dataFilesEntity.size());
+        for (DuckLakeDataFile dataFileEntity : dataFilesEntity) {
+            long dataFileId = dataFileEntity.getDataFileId();
+            String path = dataFileEntity.getPath();
+            String fileFormat = dataFileEntity.getFileFormat();
+            long rowCount = dataFileEntity.getRecordCount();
+            long fileSizeBytes = dataFileEntity.getFileSizeBytes();
+            long footerSizeBytes = dataFileEntity.getFooterSize();
+            long startRowId = dataFileEntity.getRowIdStart();
+            long fileOrder = dataFileEntity.getFileOrder();
 
-    @Override
-    public DeleteFiles getTableDeleteFiles(long snapshotId, long tableId) {
-        // TODO: implement this
-        return null;
+            DuckLakeDeleteFile deleteFileEntity = dataFileToDeleteFile.get(dataFileId);
+            DeleteFile deleteFile = new DeleteFileImpl(deleteFileEntity.getDeleteFileId(),
+                    deleteFileEntity.getDataFileId(),
+                    deleteFileEntity.getPath(), FileFormat.PARQUET, deleteFileEntity.getDeleteCount(),
+                    deleteFileEntity.getFileSizeBytes(), deleteFileEntity.getFooterSize(),
+                    deleteFileEntity.getEncryptionKey());
+
+            DataFileImpl dataFile = new DataFileImpl(dataFileId, tableId, deleteFile,
+                    /* todo */ null, path, FileFormat.valueOf(fileFormat), rowCount, fileSizeBytes,
+                    footerSizeBytes, startRowId, fileOrder);
+            dataFiles.add(dataFile);
+        }
+        return new DataFilesImpl(dataFiles);
     }
 }

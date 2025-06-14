@@ -5,7 +5,23 @@ public interface DataFile {
 
     long tableId();
 
-    long snapshotId();
+    DeleteFile deleteFile();
 
     DataFileStatistics dataFileStatistics();
+
+    String path();
+
+    FileFormat fileFormat();
+
+    long rowCount();
+
+    long fileSizeBytes();
+
+    long footerSizeBytes();
+
+    long startRowId();
+
+    long fileOrder();
+
+    // TODO PartitionInfo partitionInfo();
 }

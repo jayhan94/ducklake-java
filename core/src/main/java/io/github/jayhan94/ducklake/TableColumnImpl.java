@@ -17,8 +17,14 @@ public class TableColumnImpl implements TableColumn, Serializable {
     private final Object initialDefault;
     private final TableColumnStatistics columnStatistics;
 
-    public TableColumnImpl(long columnId, String columnName, DataType columnType, Boolean isNullable,
-            Object defaultValue, Object initialDefault, TableColumnStatistics columnStatistics) {
+    public TableColumnImpl(
+            long columnId,
+            String columnName,
+            DataType columnType,
+            Boolean isNullable,
+            Object defaultValue,
+            Object initialDefault,
+            TableColumnStatistics columnStatistics) {
         this.columnId = columnId;
         this.columnName = columnName;
         this.columnType = columnType;

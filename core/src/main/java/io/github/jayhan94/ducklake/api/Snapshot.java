@@ -6,8 +6,4 @@ public interface Snapshot {
     long timestamp();
 
     long schemaVersion();
-
-    DataFiles tableDataFiles(long tableId);
-
-    DeleteFiles tableDeleteFiles(long tableId);
 }

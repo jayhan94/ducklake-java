@@ -12,6 +12,8 @@ public interface Table {
 
     TableSchema tableSchema();
 
+    DataFiles dataFiles();
+
     // get the snapshot of the table
     Snapshot snapshot();
 

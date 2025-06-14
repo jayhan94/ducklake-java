@@ -4,8 +4,10 @@ import com.google.common.base.Function;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import io.github.jayhan94.ducklake.catalog.sql.SQLTransaction;
+import io.github.jayhan94.ducklake.catalog.duckdb.sql.SQLTransaction;
 import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
+import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
+import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
@@ -199,5 +201,15 @@ public class CatalogDuckDB implements Closeable, SQLTransaction {
     @Override
     public List<DuckLakeColumn> getTableColumns(long snapshotId, long tableId) {
         return withTransaction(transaction -> transaction.getTableColumns(snapshotId, tableId));
+    }
+
+    @Override
+    public List<DuckLakeDataFile> getTableDataFiles(long snapshotId, long tableId) {
+        return withTransaction(transaction -> transaction.getTableDataFiles(snapshotId, tableId));
+    }
+
+    @Override
+    public List<DuckLakeDeleteFile> getTableDeleteFiles(long snapshotId, long tableId) {
+        return withTransaction(transaction -> transaction.getTableDeleteFiles(snapshotId, tableId));
     }
 }

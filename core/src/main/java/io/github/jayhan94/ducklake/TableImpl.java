@@ -2,6 +2,7 @@ package io.github.jayhan94.ducklake;
 
 import java.io.Serializable;
 
+import io.github.jayhan94.ducklake.api.DataFiles;
 import io.github.jayhan94.ducklake.api.Scan;
 import io.github.jayhan94.ducklake.api.Schema;
 import io.github.jayhan94.ducklake.api.Snapshot;
@@ -17,6 +18,7 @@ public class TableImpl implements Table, Serializable {
     private final long tableId;
     private final String tableName;
     private final TableSchema tableSchema;
+    private final DataFiles dataFiles;
     private final TableStatistics tableStatistics;
 
     public TableImpl(
@@ -25,12 +27,14 @@ public class TableImpl implements Table, Serializable {
             long tableId,
             String tableName,
             TableSchema tableSchema,
+            DataFiles dataFiles,
             TableStatistics tableStatistics) {
         this.snapshot = snapshot;
         this.schema = schema;
         this.tableId = tableId;
         this.tableName = tableName;
         this.tableSchema = tableSchema;
+        this.dataFiles = dataFiles;
         this.tableStatistics = tableStatistics;
     }
 
@@ -47,6 +51,11 @@ public class TableImpl implements Table, Serializable {
     @Override
     public TableSchema tableSchema() {
         return tableSchema;
+    }
+
+    @Override
+    public DataFiles dataFiles() {
+        return dataFiles;
     }
 
     @Override
