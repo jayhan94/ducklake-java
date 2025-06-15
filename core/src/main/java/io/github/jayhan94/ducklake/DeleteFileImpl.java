@@ -5,17 +5,24 @@ import io.github.jayhan94.ducklake.api.FileFormat;
 
 public class DeleteFileImpl implements DeleteFile {
 
-    private final long deleteFileId;
-    private final long dataFileId;
+    private final Long deleteFileId;
+    private final Long dataFileId;
     private final String path;
     private final FileFormat fileFormat;
-    private final long deleteCount;
-    private final long fileSizeBytes;
-    private final long footerSizeBytes;
+    private final Long deleteCount;
+    private final Long fileSizeBytes;
+    private final Long footerSizeBytes;
     private final String encryptionKey;
 
-    public DeleteFileImpl(long deleteFileId, long dataFileId, String path, FileFormat fileFormat,
-            long deleteCount, long fileSizeBytes, long footerSizeBytes, String encryptionKey) {
+    public DeleteFileImpl(
+            Long deleteFileId, 
+            Long dataFileId,
+            String path,
+            FileFormat fileFormat,
+            Long deleteCount,
+            Long fileSizeBytes,
+            Long footerSizeBytes,
+            String encryptionKey) {
         this.deleteFileId = deleteFileId;
         this.dataFileId = dataFileId;
         this.path = path;
@@ -27,12 +34,12 @@ public class DeleteFileImpl implements DeleteFile {
     }
 
     @Override
-    public long deleteFileId() {
+    public Long deleteFileId() {
         return deleteFileId;
     }
 
     @Override
-    public long dataFileId() {
+    public Long dataFileId() {
         return dataFileId;
     }
 
@@ -47,17 +54,17 @@ public class DeleteFileImpl implements DeleteFile {
     }
 
     @Override
-    public long deleteCount() {
+    public Long deleteCount() {
         return deleteCount;
     }
 
     @Override
-    public long fileSizeBytes() {
+    public Long fileSizeBytes() {
         return fileSizeBytes;
     }
 
     @Override
-    public long footerSizeBytes() {
+    public Long footerSizeBytes() {
         return footerSizeBytes;
     }
 

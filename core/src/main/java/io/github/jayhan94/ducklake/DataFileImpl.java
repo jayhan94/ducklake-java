@@ -6,17 +6,17 @@ import io.github.jayhan94.ducklake.api.DeleteFile;
 import io.github.jayhan94.ducklake.api.FileFormat;
 
 public class DataFileImpl implements DataFile {
-    private final long dataFileId;
-    private final long tableId;
+    private final Long dataFileId;
+    private final Long tableId;
     private final DeleteFile deleteFile;
     private final DataFileStatistics dataFileStatistics;
     private final String path;
     private final FileFormat fileFormat;
-    private final long rowCount;
-    private final long fileSizeBytes;
-    private final long footerSizeBytes;
-    private final long startRowId;
-    private final long fileOrder;
+    private final Long rowCount;
+    private final Long fileSizeBytes;
+    private final Long footerSizeBytes;
+    private final Long startRowId;
+    private final Long fileOrder;
 
     public DataFileImpl(
             long dataFileId,
@@ -25,11 +25,11 @@ public class DataFileImpl implements DataFile {
             DataFileStatistics dataFileStatistics,
             String path,
             FileFormat fileFormat,
-            long rowCount,
-            long fileSizeBytes,
-            long footerSizeBytes,
-            long startRowId,
-            long fileOrder) {
+            Long rowCount,
+            Long fileSizeBytes,
+            Long footerSizeBytes,
+            Long startRowId,
+            Long fileOrder) {
         this.dataFileId = dataFileId;
         this.tableId = tableId;
         this.deleteFile = deleteFile;
@@ -44,12 +44,12 @@ public class DataFileImpl implements DataFile {
     }
 
     @Override
-    public long dataFileId() {
+    public Long dataFileId() {
         return dataFileId;
     }
 
     @Override
-    public long tableId() {
+    public Long tableId() {
         return tableId;
     }
 
@@ -74,27 +74,27 @@ public class DataFileImpl implements DataFile {
     }
 
     @Override
-    public long rowCount() {
+    public Long rowCount() {
         return rowCount;
     }
 
     @Override
-    public long fileSizeBytes() {
+    public Long fileSizeBytes() {
         return fileSizeBytes;
     }
 
     @Override
-    public long footerSizeBytes() {
+    public Long footerSizeBytes() {
         return footerSizeBytes;
     }
 
     @Override
-    public long startRowId() {
+    public Long startRowId() {
         return startRowId;
     }
 
     @Override
-    public long fileOrder() {
+    public Long fileOrder() {
         return fileOrder;
     }
 

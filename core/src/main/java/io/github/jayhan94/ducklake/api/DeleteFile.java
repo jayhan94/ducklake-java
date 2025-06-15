@@ -4,19 +4,19 @@ package io.github.jayhan94.ducklake.api;
  * DeleteFile corresponds to a DataFile and contains the row_ids that have been deleted from this DataFile
  */
 public interface DeleteFile {
-    long deleteFileId();
+    Long deleteFileId();
 
-    long dataFileId();
+    Long dataFileId();
 
     String path();
 
     FileFormat fileFormat();
 
-    long deleteCount();
+    Long deleteCount();
 
-    long fileSizeBytes();
+    Long fileSizeBytes();
 
-    long footerSizeBytes();
+    Long footerSizeBytes();
 
     String encryptionKey();
 }

@@ -1,9 +1,9 @@
 package io.github.jayhan94.ducklake.api;
 
 public interface DataFile {
-    long dataFileId();
+    Long dataFileId();
 
-    long tableId();
+    Long tableId();
 
     DeleteFile deleteFile();
 
@@ -13,15 +13,15 @@ public interface DataFile {
 
     FileFormat fileFormat();
 
-    long rowCount();
+    Long rowCount();
 
-    long fileSizeBytes();
+    Long fileSizeBytes();
 
-    long footerSizeBytes();
+    Long footerSizeBytes();
 
-    long startRowId();
+    Long startRowId();
 
-    long fileOrder();
+    Long fileOrder();
 
     // TODO PartitionInfo partitionInfo();
 }

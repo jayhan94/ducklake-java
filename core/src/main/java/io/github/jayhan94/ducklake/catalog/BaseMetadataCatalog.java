@@ -172,7 +172,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
         // Get table information
         DuckLakeTable tableEntity = catalogdb.getTable(snapshotId, schema.schemaId(), tableName);
         if (tableEntity == null) {
-            throw new IllegalArgumentException("Table doesn't exist: " + tableIdentifier.toString());
+            throw new IllegalArgumentException("Table " + tableIdentifier.toString() + " doesn't exist at snapshot: " + snapshotId);
         }
 
         long tableId = tableEntity.getTableId();
@@ -297,25 +297,43 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                         }));
         List<DataFile> dataFiles = new ArrayList<>(dataFilesEntity.size());
         for (DuckLakeDataFile dataFileEntity : dataFilesEntity) {
-            long dataFileId = dataFileEntity.getDataFileId();
+            Long dataFileId = dataFileEntity.getDataFileId();
             String path = dataFileEntity.getPath();
             String fileFormat = dataFileEntity.getFileFormat();
-            long rowCount = dataFileEntity.getRecordCount();
-            long fileSizeBytes = dataFileEntity.getFileSizeBytes();
-            long footerSizeBytes = dataFileEntity.getFooterSize();
-            long startRowId = dataFileEntity.getRowIdStart();
-            long fileOrder = dataFileEntity.getFileOrder();
+            Long rowCount = dataFileEntity.getRecordCount();
+            Long fileSizeBytes = dataFileEntity.getFileSizeBytes();
+            Long footerSizeBytes = dataFileEntity.getFooterSize();
+            Long startRowId = dataFileEntity.getRowIdStart();
+            Long fileOrder = dataFileEntity.getFileOrder();
 
+            DeleteFile deleteFile = null;
             DuckLakeDeleteFile deleteFileEntity = dataFileToDeleteFile.get(dataFileId);
-            DeleteFile deleteFile = new DeleteFileImpl(deleteFileEntity.getDeleteFileId(),
+            if (deleteFileEntity != null) {
+                deleteFile = new DeleteFileImpl(
+                    deleteFileEntity.getDeleteFileId(),
                     deleteFileEntity.getDataFileId(),
-                    deleteFileEntity.getPath(), FileFormat.PARQUET, deleteFileEntity.getDeleteCount(),
-                    deleteFileEntity.getFileSizeBytes(), deleteFileEntity.getFooterSize(),
-                    deleteFileEntity.getEncryptionKey());
+                    deleteFileEntity.getPath(),
+                    FileFormat.PARQUET,
+                    deleteFileEntity.getDeleteCount(),
+                    deleteFileEntity.getFileSizeBytes(),
+                    deleteFileEntity.getFooterSize(),
+                    deleteFileEntity.getEncryptionKey()
+                );
+            }
 
-            DataFileImpl dataFile = new DataFileImpl(dataFileId, tableId, deleteFile,
-                    /* todo */ null, path, FileFormat.valueOf(fileFormat), rowCount, fileSizeBytes,
-                    footerSizeBytes, startRowId, fileOrder);
+            DataFileImpl dataFile = new DataFileImpl(
+                dataFileId,
+                tableId,
+                deleteFile,
+                null,
+                path,
+                FileFormat.valueOf(fileFormat.toUpperCase()),
+                rowCount,
+                fileSizeBytes,
+                footerSizeBytes,
+                startRowId,
+                fileOrder
+            );
             dataFiles.add(dataFile);
         }
         return new DataFilesImpl(dataFiles);
