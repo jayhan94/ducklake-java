@@ -1,41 +1,50 @@
 package io.github.jayhan94.ducklake.api;
 
-public interface TableColumnStatistics extends PrettyPrint {
-    @Override
-    default String prettyString() {
-        return "TableColumnStatistics{" +
-                "containsNull=" + containsNull() +
-                ", containsNaN=" + containsNaN() +
-                ", minValue=" + minValue() +
-                ", maxValue=" + maxValue() +
-                "}";
-    }
+import java.util.Optional;
+
+/**
+ * Represents aggregated statistics for a column at the table level.
+ */
+public interface TableColumnStatistics {
+    /**
+     * Gets the ID of the table this column statistics belongs to.
+     * 
+     * @return the table ID
+     */
+    long tableId();
 
     /**
-     * Check if the column contains null values
+     * Gets the ID of the column this statistics belongs to.
      * 
-     * @return true if the column contains null values
+     * @return the column ID
      */
-    boolean containsNull();
+    long columnId();
 
     /**
-     * Check if the column contains NaN values
+     * Checks if the column contains any null values.
      * 
-     * @return true if the column contains NaN values
+     * @return true if the column contains at least one null value, false otherwise
      */
-    boolean containsNaN();
+    Optional<Boolean> containsNull();
 
     /**
-     * Get the minimum value of the column
+     * Checks if the column contains any NaN (Not-a-Number) values.
      * 
-     * @return the minimum value of the column
+     * @return true if the column contains at least one NaN value, false otherwise
      */
-    String minValue();
+    Optional<Boolean> containsNaN();
 
     /**
-     * Get the maximum value of the column
+     * Gets the minimum value for the column.
      * 
-     * @return the maximum value of the column
+     * @return the minimum value as a string, or null if not available
      */
-    String maxValue();
+    Optional<String> minValue();
+
+    /**
+     * Gets the maximum value for the column.
+     * 
+     * @return the maximum value as a string, or null if not available
+     */
+    Optional<String> maxValue();
 }

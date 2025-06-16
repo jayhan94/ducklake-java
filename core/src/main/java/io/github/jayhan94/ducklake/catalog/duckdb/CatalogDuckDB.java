@@ -217,13 +217,13 @@ public class CatalogDuckDB implements Closeable, SQLTransaction {
     }
 
     @Override
-    public List<DuckLakeTableColumnStats> getTableColumnStats(long snapshotId, long tableId) {
-        return withTransaction(transaction -> transaction.getTableColumnStats(snapshotId, tableId));
+    public List<DuckLakeTableColumnStats> getTableColumnStats(long tableId) {
+        return withTransaction(transaction -> transaction.getTableColumnStats(tableId));
     }
 
     @Override
-    public DuckLakeTableStats getTableStats(long snapshotId, long tableId) {
-        return withTransaction(transaction -> transaction.getTableStats(snapshotId, tableId));
+    public DuckLakeTableStats getTableStats(long tableId) {
+        return withTransaction(transaction -> transaction.getTableStats(tableId));
     }
 
     @Override

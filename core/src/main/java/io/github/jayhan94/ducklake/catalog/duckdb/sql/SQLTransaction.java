@@ -163,7 +163,7 @@ public interface SQLTransaction {
     List<DuckLakeDeleteFile> getTableDeleteFiles(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
 
     /**
-     * Get all table column statistics for a specific table at a snapshot
+     * Get all table column statistics for a specific table
      * 
      * @param snapshotId snapshot ID
      * @param tableId    table ID
@@ -173,16 +173,12 @@ public interface SQLTransaction {
             SELECT table_id, column_id, contains_null, contains_nan, min_value, max_value
             FROM ducklake_table_column_stats
             WHERE table_id = :tableId
-            AND begin_snapshot <= :snapshotId
-            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
             """)
-    List<DuckLakeTableColumnStats> getTableColumnStats(@Bind("snapshotId") long snapshotId,
-            @Bind("tableId") long tableId);
+    List<DuckLakeTableColumnStats> getTableColumnStats(@Bind("tableId") long tableId);
 
     /**
      * Get all table statistics for a specific table at a snapshot
      * 
-     * @param snapshotId snapshot ID
      * @param tableId    table ID
      * @return table statistics
      */
@@ -190,8 +186,6 @@ public interface SQLTransaction {
             SELECT table_id, record_count, next_row_id, file_size_bytes
             FROM ducklake_table_stats
             WHERE table_id = :tableId
-            AND begin_snapshot <= :snapshotId
-            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
             """)
-    DuckLakeTableStats getTableStats(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
+    DuckLakeTableStats getTableStats(@Bind("tableId") long tableId);
 }

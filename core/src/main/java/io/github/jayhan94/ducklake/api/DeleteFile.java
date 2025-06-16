@@ -1,60 +1,63 @@
 package io.github.jayhan94.ducklake.api;
 
 /**
- * DeleteFile corresponds to a DataFile and contains the row_ids that have been deleted from this DataFile
+ * Represents a delete file, which marks specific rows in a data file as
+ * deleted.
  */
-public interface DeleteFile extends PrettyPrint {
-    @Override
-    default String prettyString() {
-        return "DeleteFile(" +
-                "deleteFileId=" + deleteFileId() +
-                ", dataFileId=" + dataFileId() +
-                ", path=" + path() +
-                ", fileFormat=" + fileFormat() +
-                ", deleteCount=" + deleteCount() +
-                ", fileSizeBytes=" + fileSizeBytes() +
-                ", footerSizeBytes=" + footerSizeBytes() +
-                ", encryptionKey=" + encryptionKey() +
-                ")";
-    }
-
+public interface DeleteFile {
     /**
-     * The id of the delete file
+     * Gets the unique ID for this delete file.
+     * 
+     * @return the delete file ID
      */
     Long deleteFileId();
 
     /**
-     * The id of the data file
+     * Gets the ID of the data file from which rows were deleted.
+     * 
+     * @return the corresponding data file ID
      */
     Long dataFileId();
 
     /**
-     * The path of the data file
+     * Gets the path to the delete file.
+     * 
+     * @return the file path, which can be absolute or relative
      */
     String path();
 
     /**
-     * The format of the data file
+     * Gets the format of the delete file.
+     * 
+     * @return the file format
      */
     FileFormat fileFormat();
 
     /**
-     * The number of rows that have been deleted from the data file
+     * Gets the number of rows marked as deleted in this file.
+     * 
+     * @return the count of deleted rows
      */
     Long deleteCount();
 
     /**
-     * The size of the data file
+     * Gets the total size of the delete file in bytes.
+     * 
+     * @return the file size in bytes
      */
     Long fileSizeBytes();
 
     /**
-     * The size of the footer of the data file
+     * Gets the size of the file's metadata footer in bytes.
+     * 
+     * @return the footer size in bytes
      */
     Long footerSizeBytes();
 
     /**
-     * The encryption key of the data file
+     * Gets the encryption key used for the delete file, if any.
+     * 
+     * @return the encryption key as a string, or null if not encrypted
      */
     String encryptionKey();
 }

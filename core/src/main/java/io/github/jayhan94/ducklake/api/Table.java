@@ -2,27 +2,69 @@ package io.github.jayhan94.ducklake.api;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
- * Table is a view of the table at a specific snapshot
+ * Represents a DuckLake table. It provides access to the table's metadata,
+ * schema,
+ * and data files for a specific {@link Snapshot}.
  */
 public interface Table {
+    /**
+     * Gets the unique ID of the table.
+     * 
+     * @return the table ID
+     */
     long tableId();
 
+    /**
+     * Gets the name of the table.
+     * 
+     * @return the table name
+     */
     String tableName();
 
+    /**
+     * Gets the schema of the table.
+     * 
+     * @return the table schema as a {@link TableSchema} instance
+     */
     TableSchema tableSchema();
 
+    /**
+     * Gets the list of data files for the current snapshot of the table.
+     * 
+     * @return a list of {@link DataFile}
+     */
     List<DataFile> dataFiles();
 
-    // get the snapshot of the table
+    /**
+     * Gets the snapshot that this table view is based on.
+     * 
+     * @return the {@link Snapshot} instance
+     */
     Snapshot snapshot();
 
+    /**
+     * Gets the schema (namespace) this table belongs to.
+     * 
+     * @return the {@link Schema} instance
+     */
     Schema schema();
 
+    /**
+     * Creates a new scan for this table.
+     * 
+     * @return a {@link Scan} builder to configure the scan
+     */
     Scan scan();
 
-    TableStatistics tableStatistics();
+    /**
+     * Gets the statistics for this table.
+     * 
+     * @return a {@link TableStatistics} instance
+     */
+    Optional<TableStatistics> tableStatistics();
 
     /**
      * TableIdentifier uniquely identifies a table within a schema

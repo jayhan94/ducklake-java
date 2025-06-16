@@ -1,9 +1,9 @@
 package io.github.jayhan94.ducklake;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import io.github.jayhan94.ducklake.api.TableColumn;
-import io.github.jayhan94.ducklake.api.TableColumnStatistics;
 import io.github.jayhan94.ducklake.datatype.DataType;
 import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
@@ -14,7 +14,6 @@ public class TableColumnImpl implements TableColumn, Serializable {
     private final Boolean isNullable;
     private final Object defaultValue;
     private final Object initialDefault;
-    private final TableColumnStatistics columnStatistics;
 
     public TableColumnImpl(
             long columnId,
@@ -22,15 +21,13 @@ public class TableColumnImpl implements TableColumn, Serializable {
             DataType columnType,
             Boolean isNullable,
             Object defaultValue,
-            Object initialDefault,
-            TableColumnStatistics columnStatistics) {
+            Object initialDefault) {
         this.columnId = columnId;
         this.columnName = columnName;
         this.columnType = columnType;
         this.isNullable = isNullable;
         this.defaultValue = defaultValue;
         this.initialDefault = initialDefault;
-        this.columnStatistics = columnStatistics;
     }
 
     @Override
@@ -54,18 +51,13 @@ public class TableColumnImpl implements TableColumn, Serializable {
     }
 
     @Override
-    public Object defaultValue() {
-        return defaultValue;
+    public Optional<Object> defaultValue() {
+        return Optional.ofNullable(defaultValue);
     }
 
     @Override
-    public Object initialDefault() {
-        return initialDefault;
-    }
-
-    @Override
-    public TableColumnStatistics columnStatistics() {
-        return columnStatistics;
+    public Optional<Object> initialDefault() {
+        return Optional.ofNullable(initialDefault);
     }
 
     @Override

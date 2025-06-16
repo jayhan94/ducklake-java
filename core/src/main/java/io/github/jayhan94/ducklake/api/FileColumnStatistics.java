@@ -1,53 +1,78 @@
 package io.github.jayhan94.ducklake.api;
 
+import java.util.Optional;
+
+/**
+ * Represents statistics for a single column within a specific data file.
+ */
 public interface FileColumnStatistics {
     /**
-     * The id of the data file
+     * Gets the ID of the data file.
+     * 
+     * @return the data file ID
      */
     long dataFileId();
 
     /**
-     * The id of the table
+     * Gets the ID of the table this data file belongs to.
+     * 
+     * @return the table ID
      */
     long tableId();
 
     /**
-     * The id of the column
+     * Gets the ID of the column.
+     * 
+     * @return the column ID
      */
     long columnId();
 
     /**
-     * The size of the column
+     * Gets the total size of the column's data within the file in bytes.
+     * 
+     * @return the column size in bytes
      */
     long columnSizeBytes();
 
     /**
-     * The number of top level values in the column
+     * Gets the total number of valid values in the column.
+     * 
+     * @return the total value count
      */
-    long valueCount();
+    Optional<Long> valueCount();
 
     /**
-     * The number of nulls in the column
+     * Gets the number of null values in the column.
+     * 
+     * @return the null value count
      */
-    long nullCount();
+    Optional<Long> nullCount();
 
     /**
-     * The number of NaN values in the column
+     * Gets the number of NaN (Not-a-Number) values in the column.
+     * 
+     * @return the NaN value count
      */
-    long nanCount();
+    Optional<Long> nanCount();
 
     /**
-     * The minimum value in the column
+     * Gets the minimum value for the column in this file.
+     * 
+     * @return the minimum value as a string
      */
-    String minValue();
+    Optional<String> minValue();
 
     /**
-     * The maximum value in the column
+     * Gets the maximum value for the column in this file.
+     * 
+     * @return the maximum value as a string
      */
-    String maxValue();
+    Optional<String> maxValue();
 
     /**
-     * Whether the column contains NaN values
+     * Checks if the column in this file contains any NaN values.
+     * 
+     * @return true if the column contains at least one NaN value, false otherwise
      */
-    boolean containsNaN();
+    Optional<Boolean> containsNaN();
 }

@@ -1,5 +1,7 @@
 package io.github.jayhan94.ducklake;
 
+import java.util.Optional;
+
 import io.github.jayhan94.ducklake.api.FileColumnStatistics;
 import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
@@ -7,25 +9,25 @@ public class FileColumnStatisticsImpl implements FileColumnStatistics {
     private final long dataFileId;
     private final long tableId;
     private final long columnId;
-    private final long columnSizeBytes;
-    private final long valueCount;
-    private final long nullCount;
-    private final long nanCount;
+    private final Long columnSizeBytes;
+    private final Long valueCount;
+    private final Long nullCount;
+    private final Long nanCount;
     private final String minValue;
     private final String maxValue;
-    private final boolean containsNaN;
+    private final Boolean containsNaN;
 
     public FileColumnStatisticsImpl(
             long dataFileId,
             long tableId,
             long columnId,
-            long columnSizeBytes,
-            long valueCount,
-            long nullCount,
-            long nanCount,
+            Long columnSizeBytes,
+            Long valueCount,
+            Long nullCount,
+            Long nanCount,
             String minValue,
             String maxValue,
-            boolean containsNaN) {
+            Boolean containsNaN) {
         this.dataFileId = dataFileId;
         this.tableId = tableId;
         this.columnId = columnId;
@@ -59,33 +61,33 @@ public class FileColumnStatisticsImpl implements FileColumnStatistics {
     }
 
     @Override
-    public long valueCount() {
-        return valueCount;
+    public Optional<Long> valueCount() {
+        return Optional.ofNullable(valueCount);
     }
 
     @Override
-    public long nullCount() {
-        return nullCount;
+    public Optional<Long> nullCount() {
+        return Optional.ofNullable(nullCount);
     }
 
     @Override
-    public long nanCount() {
-        return nanCount;
+    public Optional<Long> nanCount() {
+        return Optional.ofNullable(nanCount);
     }
 
     @Override
-    public String minValue() {
-        return minValue;
+    public Optional<String> minValue() {
+        return Optional.ofNullable(minValue);
     }
 
     @Override
-    public String maxValue() {
-        return maxValue;
+    public Optional<String> maxValue() {
+        return Optional.ofNullable(maxValue);
     }
 
     @Override
-    public boolean containsNaN() {
-        return containsNaN;
+    public Optional<Boolean> containsNaN() {
+        return Optional.ofNullable(containsNaN);
     }
 
     @Override

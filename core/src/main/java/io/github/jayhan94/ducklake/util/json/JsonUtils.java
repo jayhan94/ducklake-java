@@ -6,6 +6,7 @@ import io.github.jayhan94.ducklake.datatype.DataType;
 
 public final class JsonUtils {
     private static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapterFactory(new OptionalAdapterFactory())
             .registerTypeAdapter(DataType.class, new DataTypeAdapter())
             .setPrettyPrinting()
             .disableHtmlEscaping()

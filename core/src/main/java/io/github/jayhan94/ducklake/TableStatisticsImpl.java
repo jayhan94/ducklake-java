@@ -7,25 +7,25 @@ import io.github.jayhan94.ducklake.util.json.JsonUtils;
 import java.util.List;
 
 public class TableStatisticsImpl implements TableStatistics {
-    private final long rowCount;
+    private final long recordCount;
     private final long totalSizeBytes;
     private final long nextRowId;
     private final List<TableColumnStatistics> columnStatistics;
 
     public TableStatisticsImpl(
-            long rowCount,
+            long recordCount,
             long totalSizeBytes,
             long nextRowId,
             List<TableColumnStatistics> columnStatistics) {
-        this.rowCount = rowCount;
+        this.recordCount = recordCount;
         this.totalSizeBytes = totalSizeBytes;
         this.nextRowId = nextRowId;
         this.columnStatistics = columnStatistics;
     }
 
     @Override
-    public long rowCount() {
-        return rowCount;
+    public long recordCount() {
+        return recordCount;
     }
 
     @Override

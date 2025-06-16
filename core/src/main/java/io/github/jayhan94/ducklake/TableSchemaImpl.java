@@ -21,13 +21,6 @@ public class TableSchemaImpl implements TableSchema, Serializable {
     }
 
     @Override
-    public String prettyString() {
-        return columns.stream()
-                .map(column -> column.columnName() + ":" + column.columnType())
-                .collect(Collectors.joining(", "));
-    }
-
-    @Override
     public String toString() {
         return JsonUtils.toJson(this);
     }

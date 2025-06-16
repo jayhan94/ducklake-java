@@ -1,5 +1,7 @@
 package io.github.jayhan94.ducklake;
 
+import java.util.Optional;
+
 import io.github.jayhan94.ducklake.api.DataFile;
 import io.github.jayhan94.ducklake.api.DataFileStatistics;
 import io.github.jayhan94.ducklake.api.DeleteFile;
@@ -13,9 +15,6 @@ public class DataFileImpl implements DataFile {
     private final DataFileStatistics dataFileStatistics;
     private final String path;
     private final FileFormat fileFormat;
-    private final Long rowCount;
-    private final Long fileSizeBytes;
-    private final Long footerSizeBytes;
     private final Long startRowId;
     private final Long fileOrder;
 
@@ -23,25 +22,19 @@ public class DataFileImpl implements DataFile {
             long dataFileId,
             long tableId,
             DeleteFile deleteFile,
-            DataFileStatistics dataFileStatistics,
             String path,
             FileFormat fileFormat,
-            Long rowCount,
-            Long fileSizeBytes,
-            Long footerSizeBytes,
             Long startRowId,
-            Long fileOrder) {
+            Long fileOrder,
+            DataFileStatistics dataFileStatistics) {
         this.dataFileId = dataFileId;
         this.tableId = tableId;
         this.deleteFile = deleteFile;
-        this.dataFileStatistics = dataFileStatistics;
         this.path = path;
         this.fileFormat = fileFormat;
-        this.rowCount = rowCount;
-        this.fileSizeBytes = fileSizeBytes;
-        this.footerSizeBytes = footerSizeBytes;
         this.startRowId = startRowId;
         this.fileOrder = fileOrder;
+        this.dataFileStatistics = dataFileStatistics;
     }
 
     @Override
@@ -60,13 +53,13 @@ public class DataFileImpl implements DataFile {
     }
 
     @Override
-    public DeleteFile deleteFile() {
-        return deleteFile;
+    public Optional<DeleteFile> deleteFile() {
+        return Optional.ofNullable(deleteFile);
     }
 
     @Override
-    public DataFileStatistics dataFileStatistics() {
-        return dataFileStatistics;
+    public Long startRowId() {
+        return startRowId;
     }
 
     @Override
@@ -80,28 +73,13 @@ public class DataFileImpl implements DataFile {
     }
 
     @Override
-    public Long rowCount() {
-        return rowCount;
+    public Optional<Long> fileOrder() {
+        return Optional.ofNullable(fileOrder);
     }
 
     @Override
-    public Long fileSizeBytes() {
-        return fileSizeBytes;
-    }
-
-    @Override
-    public Long footerSizeBytes() {
-        return footerSizeBytes;
-    }
-
-    @Override
-    public Long startRowId() {
-        return startRowId;
-    }
-
-    @Override
-    public Long fileOrder() {
-        return fileOrder;
+    public DataFileStatistics dataFileStatistics() {
+        return dataFileStatistics;
     }
 
 }

@@ -1,50 +1,71 @@
 package io.github.jayhan94.ducklake.api;
 
-public interface DataFile extends PrettyPrint {
+import java.util.Optional;
+
+/**
+ * Represents a data file that contains rows for a table. It is a component of a
+ * {@link Snapshot}.
+ */
+public interface DataFile {
 
     /**
-     * Pretty print the data file
+     * Gets the unique ID for this data file.
      * 
-     * @return the pretty string
+     * @return the data file ID
      */
-    @Override
-    default String prettyString() {
-        return "DataFile{" +
-                "dataFileId=" + dataFileId() +
-                ", tableId=" + tableId() +
-                ", deleteFile=" + deleteFile() +
-                ", dataFileStatistics=" + dataFileStatistics() +
-                ", path='" + path() + '\'' +
-                ", fileFormat=" + fileFormat() +
-                ", rowCount=" + rowCount() +
-                ", fileSizeBytes=" + fileSizeBytes() +
-                ", footerSizeBytes=" + footerSizeBytes() +
-                ", startRowId=" + startRowId() +
-                ", fileOrder=" + fileOrder() +
-                "}";
-    }
-
     Long dataFileId();
 
+    /**
+     * Gets the ID of the table this data file belongs to.
+     * 
+     * @return the table ID
+     */
     Long tableId();
 
-    DeleteFile deleteFile();
+    /**
+     * Gets the corresponding delete file, if any.
+     * 
+     * @return a {@link DeleteFile} instance, or null if no deletions are associated
+     *         with this data file
+     */
+    Optional<DeleteFile> deleteFile();
 
-    DataFileStatistics dataFileStatistics();
-
+    /**
+     * Gets the path to the data file.
+     * 
+     * @return the file path, which can be absolute or relative
+     */
     String path();
 
+    /**
+     * Gets the format of the data file (e.g., PARQUET, ORC).
+     * 
+     * @return the file format
+     */
     FileFormat fileFormat();
 
-    Long rowCount();
-
-    Long fileSizeBytes();
-
-    Long footerSizeBytes();
-
+    /**
+     * Gets the starting logical row ID in the file.
+     * 
+     * @return the starting row ID
+     */
     Long startRowId();
 
-    Long fileOrder();
+    /**
+     * Gets the order of this file within the table, used for sorting and
+     * processing.
+     * 
+     * @return the file order
+     */
+    Optional<Long> fileOrder();
 
     // TODO PartitionInfo partitionInfo();
+
+    /**
+     * Gets the statistics for this data file.
+     * 
+     * @return a {@link DataFileStatistics} instance, or null if statistics are not
+     *         available
+     */
+    DataFileStatistics dataFileStatistics();
 }

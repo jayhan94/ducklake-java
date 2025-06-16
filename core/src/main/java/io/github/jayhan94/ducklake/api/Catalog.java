@@ -60,22 +60,4 @@ public interface Catalog {
      * @return the schema
      */
     TableSchema getTableSchema(long snapshotId, long tableId);
-
-    /**
-     * Get a table statistics by table name and snapshot ID
-     * 
-     * @param snapshotId snapshot ID
-     * @param tableName  table name
-     * @return the statistics
-     */
-    TableStatistics getTableStatistics(long snapshotId, long tableId);
-
-    /**
-     * Get the data files of a table
-     * 
-     * @param snapshotId snapshot ID
-     * @param tableName  table name
-     * @return the data files
-     */
-    List<DataFile> getTableDataFiles(long snapshotId, long tableId);
 }

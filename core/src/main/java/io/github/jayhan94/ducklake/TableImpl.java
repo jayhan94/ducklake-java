@@ -2,6 +2,7 @@ package io.github.jayhan94.ducklake;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 import io.github.jayhan94.ducklake.api.DataFile;
 import io.github.jayhan94.ducklake.api.Scan;
@@ -19,7 +20,7 @@ public class TableImpl implements Table, Serializable {
     private final String tableName;
     private final TableSchema tableSchema;
     private final List<DataFile> dataFiles;
-    private final TableStatistics tableStatistics;
+    private final Optional<TableStatistics> tableStatistics;
 
     public TableImpl(
             Snapshot snapshot,
@@ -28,7 +29,7 @@ public class TableImpl implements Table, Serializable {
             String tableName,
             TableSchema tableSchema,
             List<DataFile> dataFiles,
-            TableStatistics tableStatistics) {
+            Optional<TableStatistics> tableStatistics) {
         this.snapshot = snapshot;
         this.schema = schema;
         this.tableId = tableId;
@@ -74,7 +75,7 @@ public class TableImpl implements Table, Serializable {
     }
 
     @Override
-    public TableStatistics tableStatistics() {
+    public Optional<TableStatistics> tableStatistics() {
         return tableStatistics;
     }
 

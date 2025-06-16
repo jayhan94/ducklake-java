@@ -41,10 +41,12 @@ import io.github.jayhan94.ducklake.entity.DuckLakeTableStats;
 import lombok.SneakyThrows;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -186,13 +188,13 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
 
         long tableId = tableEntity.getTableId();
 
-        // Get table columns
+        // Get table schema
         TableSchema tableSchema = getTableSchema(snapshotId, tableId);
 
         List<DataFile> dataFiles = getTableDataFiles(snapshotId, tableId);
 
-        // TODO Get table statistics
-        TableStatistics tableStatistics = null;
+        // Get table statistics
+        Optional<TableStatistics> tableStatistics = getMostRecentTableStatistics(tableId);
 
         return new TableImpl(snapshot, schema, tableId, tableName, tableSchema, dataFiles, tableStatistics);
     }
@@ -241,8 +243,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                     DataTypes.parseType(column.getColumnType()),
                     column.getNullsAllowed(),
                     column.getDefaultValue(),
-                    column.getInitialDefault(),
-                    null // TODO: implement column statistics
+                    column.getInitialDefault()
             );
         }
 
@@ -280,15 +281,18 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                 columnType,
                 column.getNullsAllowed(),
                 column.getDefaultValue(),
-                column.getInitialDefault(),
-                null // TODO: implement column statistics
+                column.getInitialDefault()
         );
     }
 
-    @Override
-    public List<DataFile> getTableDataFiles(long snapshotId, long tableId) {
+    private List<DataFile> getTableDataFiles(long snapshotId, long tableId) {
         List<DuckLakeDataFile> dataFilesEntity = catalogdb.getTableDataFiles(snapshotId, tableId);
-        List<DuckLakeDeleteFile> deleteFilesEntity = catalogdb.getTableDeleteFiles(snapshotId, tableId);
+        // If no data files, return empty list
+        if (dataFilesEntity.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Get data file column statistics
         Map<Long, List<DuckLakeFileColumnStatistics>> dataFileColumnStatisticsEntity = dataFilesEntity.stream()
                 .collect(Collectors.toMap(
                         DuckLakeDataFile::getDataFileId,
@@ -298,6 +302,9 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                                     "Each data file should have only one file column statistics, found duplicate data file ID: "
                                             + existing.get(0).getDataFileId());
                         }));
+
+        // Get delete files
+        List<DuckLakeDeleteFile> deleteFilesEntity = catalogdb.getTableDeleteFiles(snapshotId, tableId);
         Map<Long, DuckLakeDeleteFile> dataFileToDeleteFile = deleteFilesEntity.stream()
                 .collect(Collectors.toMap(
                         DuckLakeDeleteFile::getDataFileId,
@@ -307,17 +314,17 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                                     "Each data file should have only one delete file, found duplicate data file ID: "
                                             + existing.getDataFileId());
                         }));
+
+        // Build data files
         List<DataFile> dataFiles = new ArrayList<>(dataFilesEntity.size());
         for (DuckLakeDataFile dataFileEntity : dataFilesEntity) {
             Long dataFileId = dataFileEntity.getDataFileId();
             String path = dataFileEntity.getPath();
             String fileFormat = dataFileEntity.getFileFormat();
-            Long rowCount = dataFileEntity.getRecordCount();
-            Long fileSizeBytes = dataFileEntity.getFileSizeBytes();
-            Long footerSizeBytes = dataFileEntity.getFooterSize();
             Long startRowId = dataFileEntity.getRowIdStart();
             Long fileOrder = dataFileEntity.getFileOrder();
 
+            // Build file column statistics
             List<FileColumnStatistics> fileColumnStatistics = dataFileColumnStatisticsEntity.get(dataFileId).stream()
                     .map(fileColStatsEntity -> new FileColumnStatisticsImpl(
                             fileColStatsEntity.getDataFileId(),
@@ -326,19 +333,20 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                             fileColStatsEntity.getColumnSizeBytes(),
                             fileColStatsEntity.getValueCount(),
                             fileColStatsEntity.getNullCount(),
-                            -1L, // TODO: implement nan count
+                            fileColStatsEntity.getNanCount(),
                             fileColStatsEntity.getMinValue(),
                             fileColStatsEntity.getMaxValue(),
-                            fileColStatsEntity.getContainsNaN() != null && fileColStatsEntity.getContainsNaN()))
+                            fileColStatsEntity.getContainsNaN()))
                     .collect(Collectors.toList());
 
+            // Build data file statistics
             DataFileStatistics dataFileStatistics = new DataFileStatisticsImpl(
-                    rowCount,
-                    fileSizeBytes,
-                    footerSizeBytes,
-                    startRowId,
+                    dataFileEntity.getRecordCount(),
+                    dataFileEntity.getFileSizeBytes(),
+                    dataFileEntity.getFooterSize(),
                     fileColumnStatistics);
 
+            // A data file associated with a delete file or no delete files.
             DeleteFile deleteFile = null;
             DuckLakeDeleteFile deleteFileEntity = dataFileToDeleteFile.get(dataFileId);
             if (deleteFileEntity != null) {
@@ -346,7 +354,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                         deleteFileEntity.getDeleteFileId(),
                         deleteFileEntity.getDataFileId(),
                         deleteFileEntity.getPath(),
-                        FileFormat.PARQUET,
+                        FileFormat.valueOf(deleteFileEntity.getFormat().toUpperCase()),
                         deleteFileEntity.getDeleteCount(),
                         deleteFileEntity.getFileSizeBytes(),
                         deleteFileEntity.getFooterSize(),
@@ -357,22 +365,23 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                     dataFileId,
                     tableId,
                     deleteFile,
-                    dataFileStatistics,
                     path,
                     FileFormat.valueOf(fileFormat.toUpperCase()),
-                    rowCount,
-                    fileSizeBytes,
-                    footerSizeBytes,
                     startRowId,
-                    fileOrder);
+                    fileOrder,
+                    dataFileStatistics);
             dataFiles.add(dataFile);
         }
         return dataFiles;
     }
 
-    @Override
-    public TableStatistics getTableStatistics(long snapshotId, long tableId) {
-        List<DuckLakeTableColumnStats> tableColumnStatisticsEntity = catalogdb.getTableColumnStats(snapshotId, tableId);
+    private Optional<TableStatistics> getMostRecentTableStatistics(long tableId) {
+        // query the most recent stats
+        DuckLakeTableStats tableStatsEntity = catalogdb.getTableStats(tableId);
+        if (tableStatsEntity == null) {
+            return Optional.empty();
+        }
+        List<DuckLakeTableColumnStats> tableColumnStatisticsEntity = catalogdb.getTableColumnStats(tableId);
         List<TableColumnStatistics> tableColumnStatistics = tableColumnStatisticsEntity.stream()
                 .map(tableColumnStats -> new TableColumnStatisticsImpl(
                         tableColumnStats.getTableId(),
@@ -382,12 +391,11 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                         tableColumnStats.getMinValue(),
                         tableColumnStats.getMaxValue()))
                 .collect(Collectors.toList());
-        DuckLakeTableStats tableStatsEntity = catalogdb.getTableStats(snapshotId, tableId);
-        return new TableStatisticsImpl(
+        return Optional.of(new TableStatisticsImpl(
                 tableStatsEntity.getRecordCount(),
                 tableStatsEntity.getFileSizeBytes(),
                 tableStatsEntity.getNextRowId(),
-                tableColumnStatistics);
+                tableColumnStatistics));
     }
 
 }

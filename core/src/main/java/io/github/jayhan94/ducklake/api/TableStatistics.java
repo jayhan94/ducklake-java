@@ -2,42 +2,36 @@ package io.github.jayhan94.ducklake.api;
 
 import java.util.List;
 
-public interface TableStatistics extends PrettyPrint {
-    @Override
-    default String prettyString() {
-        return "TableStatistics{" +
-                "rowCount=" + rowCount() +
-                ", totalSizeBytes=" + totalSizeBytes() +
-                ", nextRowId=" + nextRowId() +
-                ", columnStatistics=" + columnStatistics() +
-                "}";
-    }
-
+/**
+ * Represents aggregated statistics for a table, such as total row count and
+ * size.
+ */
+public interface TableStatistics {
     /**
-     * Get the total number of rows in the table
+     * Gets the total number of rows in the table.
      * 
      * @return the total number of rows
      */
-    long rowCount();
+    long recordCount();
 
     /**
-     * Get the total size of the table in bytes
+     * Gets the total size of the table in bytes.
      * 
      * @return the total size of the table in bytes
      */
     long totalSizeBytes();
 
     /**
-     * Get the next row id
+     * Gets the next available row ID for the table.
      * 
      * @return the next row id
      */
     long nextRowId();
 
     /**
-     * Get the column statistics
+     * Gets the list of column-level statistics for the table.
      * 
-     * @return the column statistics
+     * @return a list of {@link TableColumnStatistics}
      */
     List<TableColumnStatistics> columnStatistics();
 }

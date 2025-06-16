@@ -1,5 +1,7 @@
 package io.github.jayhan94.ducklake;
 
+import java.util.Optional;
+
 import io.github.jayhan94.ducklake.api.TableColumnStatistics;
 import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
@@ -26,32 +28,34 @@ public class TableColumnStatisticsImpl implements TableColumnStatistics {
         this.maxValue = maxValue;
     }
 
+    @Override
     public long tableId() {
         return tableId;
     }
 
+    @Override
     public long columnId() {
         return columnId;
     }
 
     @Override
-    public boolean containsNull() {
-        return containsNull;
+    public Optional<Boolean> containsNull() {
+        return Optional.ofNullable(containsNull);
     }
 
     @Override
-    public boolean containsNaN() {
-        return containsNaN;
+    public Optional<Boolean> containsNaN() {
+        return Optional.ofNullable(containsNaN);
     }
 
     @Override
-    public String minValue() {
-        return minValue;
+    public Optional<String> minValue() {
+        return Optional.ofNullable(minValue);
     }
 
     @Override
-    public String maxValue() {
-        return maxValue;
+    public Optional<String> maxValue() {
+        return Optional.ofNullable(maxValue);
     }
 
     @Override
