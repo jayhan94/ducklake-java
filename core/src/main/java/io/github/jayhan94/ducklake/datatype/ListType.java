@@ -8,7 +8,7 @@ import java.util.List;
  * Example: INT[] is represented as list with child type int32
  * Based on: https://ducklake.select/docs/stable/specification/data_types.html
  */
-public final class ListType implements DataType {
+public final class ListType extends DataType {
 
     private final DataType elementType;
 
@@ -81,10 +81,5 @@ public final class ListType implements DataType {
     @Override
     public int hashCode() {
         return elementType.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return name();
     }
 }

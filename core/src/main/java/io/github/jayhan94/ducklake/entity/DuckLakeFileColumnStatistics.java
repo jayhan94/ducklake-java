@@ -37,6 +37,9 @@ public class DuckLakeFileColumnStatistics {
     @Column(name = "null_count")
     private Long nullCount;
 
+    @Column(name = "nan_count")
+    private Long nanCount;
+
     @Column(name = "min_value")
     private String minValue;
 
@@ -44,5 +47,5 @@ public class DuckLakeFileColumnStatistics {
     private String maxValue;
 
     @Column(name = "contains_nan")
-    private Boolean containsNan;
+    private Boolean containsNaN;
 }

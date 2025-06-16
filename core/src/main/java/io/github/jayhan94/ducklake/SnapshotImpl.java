@@ -1,12 +1,10 @@
 package io.github.jayhan94.ducklake;
 
-import io.github.jayhan94.ducklake.api.DataFiles;
 import io.github.jayhan94.ducklake.api.Snapshot;
-import lombok.ToString;
+import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
 import java.io.Serializable;
 
-@ToString
 public class SnapshotImpl implements Snapshot, Serializable {
     private final long snapshotId;
     private final long timestamp;
@@ -31,5 +29,10 @@ public class SnapshotImpl implements Snapshot, Serializable {
     @Override
     public long schemaVersion() {
         return schemaVersion;
+    }
+
+    @Override
+    public String toString() {
+        return JsonUtils.toJson(this);
     }
 }

@@ -13,7 +13,7 @@ public final class BinaryTypes {
         // Utility class
     }
 
-    public static final class BlobType implements DataType {
+    public static final class BlobType extends DataType {
         public static final BlobType INSTANCE = new BlobType();
 
         private BlobType() {
@@ -52,11 +52,6 @@ public final class BinaryTypes {
         @Override
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
-        }
-
-        @Override
-        public String toString() {
-            return name();
         }
     }
 }

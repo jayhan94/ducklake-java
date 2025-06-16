@@ -13,7 +13,7 @@ public final class TemporalTypes {
         // Utility class
     }
 
-    public static final class TimeType implements DataType {
+    public static final class TimeType extends DataType {
         public static final TimeType INSTANCE = new TimeType();
 
         private TimeType() {
@@ -53,14 +53,9 @@ public final class TemporalTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class TimeTzType implements DataType {
+    public static final class TimeTzType extends DataType {
         public static final TimeTzType INSTANCE = new TimeTzType();
 
         private TimeTzType() {
@@ -100,14 +95,9 @@ public final class TemporalTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class DateType implements DataType {
+    public static final class DateType extends DataType {
         public static final DateType INSTANCE = new DateType();
 
         private DateType() {
@@ -147,14 +137,9 @@ public final class TemporalTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class TimestampType implements DataType {
+    public static final class TimestampType extends DataType {
         public static final TimestampType INSTANCE = new TimestampType();
 
         private TimestampType() {
@@ -194,14 +179,9 @@ public final class TemporalTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class TimestampTzType implements DataType {
+    public static final class TimestampTzType extends DataType {
         public static final TimestampTzType INSTANCE = new TimestampTzType();
 
         private TimestampTzType() {
@@ -241,14 +221,9 @@ public final class TemporalTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class TimestampSType implements DataType {
+    public static final class TimestampSType extends DataType {
         public static final TimestampSType INSTANCE = new TimestampSType();
 
         private TimestampSType() {
@@ -288,14 +263,9 @@ public final class TemporalTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class TimestampMsType implements DataType {
+    public static final class TimestampMsType extends DataType {
         public static final TimestampMsType INSTANCE = new TimestampMsType();
 
         private TimestampMsType() {
@@ -335,14 +305,9 @@ public final class TemporalTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class TimestampNsType implements DataType {
+    public static final class TimestampNsType extends DataType {
         public static final TimestampNsType INSTANCE = new TimestampNsType();
 
         private TimestampNsType() {
@@ -382,14 +347,9 @@ public final class TemporalTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class IntervalType implements DataType {
+    public static final class IntervalType extends DataType {
         public static final IntervalType INSTANCE = new IntervalType();
 
         private IntervalType() {
@@ -428,11 +388,6 @@ public final class TemporalTypes {
         @Override
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
-        }
-
-        @Override
-        public String toString() {
-            return name();
         }
     }
 }

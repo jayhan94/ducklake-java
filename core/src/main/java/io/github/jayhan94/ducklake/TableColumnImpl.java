@@ -5,9 +5,8 @@ import java.io.Serializable;
 import io.github.jayhan94.ducklake.api.TableColumn;
 import io.github.jayhan94.ducklake.api.TableColumnStatistics;
 import io.github.jayhan94.ducklake.datatype.DataType;
-import lombok.ToString;
+import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
-@ToString
 public class TableColumnImpl implements TableColumn, Serializable {
     private final long columnId;
     private final String columnName;
@@ -69,5 +68,8 @@ public class TableColumnImpl implements TableColumn, Serializable {
         return columnStatistics;
     }
 
-
+    @Override
+    public String toString() {
+        return JsonUtils.toJson(this);
+    }
 }

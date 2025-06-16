@@ -7,7 +7,7 @@ import java.util.List;
  * Boolean data type
  * Based on: https://ducklake.select/docs/stable/specification/data_types.html
  */
-public final class BooleanType implements DataType {
+public final class BooleanType extends DataType {
 
     public static final BooleanType INSTANCE = new BooleanType();
 
@@ -50,8 +50,4 @@ public final class BooleanType implements DataType {
         return Collections.emptyList();
     }
 
-    @Override
-    public String toString() {
-        return name();
-    }
 }

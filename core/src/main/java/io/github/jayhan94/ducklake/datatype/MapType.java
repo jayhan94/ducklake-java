@@ -8,7 +8,7 @@ import java.util.List;
  * Maps have a key type and a value type
  * Based on: https://ducklake.select/docs/stable/specification/data_types.html
  */
-public final class MapType implements DataType {
+public final class MapType extends DataType {
 
     private final DataType keyType;
     private final DataType valueType;
@@ -96,10 +96,5 @@ public final class MapType implements DataType {
     @Override
     public int hashCode() {
         return 31 * keyType.hashCode() + valueType.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return name();
     }
 }

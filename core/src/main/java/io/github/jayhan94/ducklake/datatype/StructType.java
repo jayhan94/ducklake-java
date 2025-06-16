@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * Each field has a name and a data type
  * Based on: https://ducklake.select/docs/stable/specification/data_types.html
  */
-public final class StructType implements DataType {
+public final class StructType extends DataType {
 
     private final List<StructField> fields;
 
@@ -104,11 +104,6 @@ public final class StructType implements DataType {
         return fields.hashCode();
     }
 
-    @Override
-    public String toString() {
-        return name();
-    }
-
     /**
      * Represents a field in a struct
      */
@@ -164,11 +159,6 @@ public final class StructType implements DataType {
         @Override
         public int hashCode() {
             return Objects.hash(name, type);
-        }
-
-        @Override
-        public String toString() {
-            return name + ": " + type.name();
         }
     }
 }

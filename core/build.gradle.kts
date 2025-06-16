@@ -16,13 +16,12 @@ repositories {
 }
 
 dependencies {
-    // log4j
+    // Use SLF4J for logging abstraction. The application that uses this library
+    // should provide the logging implementation.
     implementation("org.slf4j:slf4j-api:2.0.9")
-    implementation("org.apache.logging.log4j:log4j-core:2.22.0")
-    implementation("org.apache.logging.log4j:log4j-api:2.22.0")
-    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.0")
 
     implementation(libs.guava)
+    implementation("com.google.code.gson:gson:2.13.1")
 
     // duckdb
     implementation("org.duckdb:duckdb_jdbc:1.3.0.0")

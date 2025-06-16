@@ -10,12 +10,11 @@ import io.github.jayhan94.ducklake.api.Snapshot;
 import io.github.jayhan94.ducklake.api.Table;
 import io.github.jayhan94.ducklake.api.TableSchema;
 import io.github.jayhan94.ducklake.api.TableStatistics;
-import lombok.ToString;
+import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
-@ToString
 public class TableImpl implements Table, Serializable {
-    private final Snapshot snapshot;
-    private final Schema schema;
+    private transient final Snapshot snapshot;
+    private transient final Schema schema;
     private final long tableId;
     private final String tableName;
     private final TableSchema tableSchema;
@@ -77,5 +76,10 @@ public class TableImpl implements Table, Serializable {
     @Override
     public TableStatistics tableStatistics() {
         return tableStatistics;
+    }
+
+    @Override
+    public String toString() {
+        return JsonUtils.toJson(this);
     }
 }

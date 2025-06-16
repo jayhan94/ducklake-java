@@ -10,9 +10,12 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
 import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
+import io.github.jayhan94.ducklake.entity.DuckLakeFileColumnStatistics;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
+import io.github.jayhan94.ducklake.entity.DuckLakeTableColumnStats;
+import io.github.jayhan94.ducklake.entity.DuckLakeTableStats;
 
 public interface SQLTransaction {
     /**
@@ -98,7 +101,7 @@ public interface SQLTransaction {
      * Get all column information for a specific snapshot and table ID
      * 
      * @param snapshotId snapshot ID
-     * @param tableId table ID
+     * @param tableId    table ID
      * @return list of column information
      */
     @SqlQuery("""
@@ -115,7 +118,7 @@ public interface SQLTransaction {
      * Get all data file information for a specific snapshot and table ID
      * 
      * @param snapshotId snapshot ID
-     * @param tableId table ID
+     * @param tableId    table ID
      * @return list of data file information
      */
     @SqlQuery("""
@@ -128,10 +131,26 @@ public interface SQLTransaction {
     List<DuckLakeDataFile> getTableDataFiles(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
 
     /**
+     * Get all file column statistics for a specific table and data file at a
+     * snapshot
+     * 
+     * @param snapshotId snapshot ID
+     * @param tableId    table ID
+     * @param dataFileId data file ID
+     * @return list of file column statistics
+     */
+    @SqlQuery("""
+            SELECT data_file_id, table_id, column_id, column_size_bytes, value_count, null_count, min_value, max_value, contains_nan
+            FROM ducklake_file_column_statistics
+            WHERE table_id = :tableId AND data_file_id = :dataFileId
+            """)
+    List<DuckLakeFileColumnStatistics> getFileColumnStatistics(@Bind("tableId") long tableId, @Bind("dataFileId") long dataFileId);
+
+    /**
      * Get all delete files for a specific table at a snapshot
      * 
      * @param snapshotId snapshot ID
-     * @param tableId table ID
+     * @param tableId    table ID
      * @return list of delete files
      */
     @SqlQuery("""
@@ -142,4 +161,37 @@ public interface SQLTransaction {
             AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
             """)
     List<DuckLakeDeleteFile> getTableDeleteFiles(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
+
+    /**
+     * Get all table column statistics for a specific table at a snapshot
+     * 
+     * @param snapshotId snapshot ID
+     * @param tableId    table ID
+     * @return list of table column statistics
+     */
+    @SqlQuery("""
+            SELECT table_id, column_id, contains_null, contains_nan, min_value, max_value
+            FROM ducklake_table_column_stats
+            WHERE table_id = :tableId
+            AND begin_snapshot <= :snapshotId
+            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
+            """)
+    List<DuckLakeTableColumnStats> getTableColumnStats(@Bind("snapshotId") long snapshotId,
+            @Bind("tableId") long tableId);
+
+    /**
+     * Get all table statistics for a specific table at a snapshot
+     * 
+     * @param snapshotId snapshot ID
+     * @param tableId    table ID
+     * @return table statistics
+     */
+    @SqlQuery("""
+            SELECT table_id, record_count, next_row_id, file_size_bytes
+            FROM ducklake_table_stats
+            WHERE table_id = :tableId
+            AND begin_snapshot <= :snapshotId
+            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
+            """)
+    DuckLakeTableStats getTableStats(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
 }

@@ -13,7 +13,7 @@ public final class FloatTypes {
         // Utility class
     }
 
-    public static final class Float32Type implements DataType {
+    public static final class Float32Type extends DataType {
         public static final Float32Type INSTANCE = new Float32Type();
 
         private Float32Type() {
@@ -53,14 +53,9 @@ public final class FloatTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class Float64Type implements DataType {
+    public static final class Float64Type extends DataType {
         public static final Float64Type INSTANCE = new Float64Type();
 
         private Float64Type() {
@@ -99,11 +94,6 @@ public final class FloatTypes {
         @Override
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
-        }
-
-        @Override
-        public String toString() {
-            return name();
         }
     }
 }

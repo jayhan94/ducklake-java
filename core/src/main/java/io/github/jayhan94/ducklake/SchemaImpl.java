@@ -3,9 +3,8 @@ package io.github.jayhan94.ducklake;
 import java.io.Serializable;
 
 import io.github.jayhan94.ducklake.api.Schema;
-import lombok.ToString;
+import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
-@ToString
 public class SchemaImpl implements Schema, Serializable {
     private final long schemaId;
     private final String schemaName;
@@ -23,5 +22,10 @@ public class SchemaImpl implements Schema, Serializable {
     @Override
     public String schemaName() {
         return schemaName;
+    }
+
+    @Override
+    public String toString() {
+        return JsonUtils.toJson(this);
     }
 }

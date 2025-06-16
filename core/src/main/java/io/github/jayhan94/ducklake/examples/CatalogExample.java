@@ -29,16 +29,11 @@ public class CatalogExample {
         Snapshot snapshot = catalog.getSnapshot(null);
         System.out.println("--------------------------------");
         System.out.println("snapshot info");
-        System.out.println("snapshot id: " + snapshot.id());
-        System.out.println("snapshot timestamp: " + snapshot.timestamp());
-        System.out.println("snapshot schema version: " + snapshot.schemaVersion());
+        System.out.println("snapshot: " + snapshot);
         System.out.println("--------------------------------");
         System.out.println("table info");
         Table table = catalog.getTable(snapshot.id(), new TableIdentifier("a"));
-        System.out.println("table id: " + table.tableId());
-        System.out.println("table name: " + table.tableName());
-        System.out.println("table schema: " + table.tableSchema().prettyString());
-        System.out.println("table data files: " + table.dataFiles());
+        System.out.println("table: " + table);
         System.out.println("--------------------------------");
         catalog.close();
     }

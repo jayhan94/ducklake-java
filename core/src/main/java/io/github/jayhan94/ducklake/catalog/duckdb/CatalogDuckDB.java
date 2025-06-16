@@ -8,9 +8,12 @@ import io.github.jayhan94.ducklake.catalog.duckdb.sql.SQLTransaction;
 import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
 import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
+import io.github.jayhan94.ducklake.entity.DuckLakeFileColumnStatistics;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
+import io.github.jayhan94.ducklake.entity.DuckLakeTableColumnStats;
+import io.github.jayhan94.ducklake.entity.DuckLakeTableStats;
 
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.jpa.JpaMapperFactory;
@@ -211,5 +214,20 @@ public class CatalogDuckDB implements Closeable, SQLTransaction {
     @Override
     public List<DuckLakeDeleteFile> getTableDeleteFiles(long snapshotId, long tableId) {
         return withTransaction(transaction -> transaction.getTableDeleteFiles(snapshotId, tableId));
+    }
+
+    @Override
+    public List<DuckLakeTableColumnStats> getTableColumnStats(long snapshotId, long tableId) {
+        return withTransaction(transaction -> transaction.getTableColumnStats(snapshotId, tableId));
+    }
+
+    @Override
+    public DuckLakeTableStats getTableStats(long snapshotId, long tableId) {
+        return withTransaction(transaction -> transaction.getTableStats(snapshotId, tableId));
+    }
+
+    @Override
+    public List<DuckLakeFileColumnStatistics> getFileColumnStatistics(long tableId, long dataFileId) {
+        return withTransaction(transaction -> transaction.getFileColumnStatistics(tableId, dataFileId));
     }
 }

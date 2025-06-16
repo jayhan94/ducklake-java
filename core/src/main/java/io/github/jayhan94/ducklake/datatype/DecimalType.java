@@ -8,7 +8,7 @@ import java.util.List;
  * Format: decimal(P, S) where P is precision and S is scale
  * Based on: https://ducklake.select/docs/stable/specification/data_types.html
  */
-public final class DecimalType implements DataType {
+public final class DecimalType extends DataType {
 
     private final int precision;
     private final int scale;
@@ -96,10 +96,5 @@ public final class DecimalType implements DataType {
     @Override
     public int hashCode() {
         return 31 * precision + scale;
-    }
-
-    @Override
-    public String toString() {
-        return name();
     }
 }

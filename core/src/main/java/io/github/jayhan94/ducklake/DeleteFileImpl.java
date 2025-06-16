@@ -2,6 +2,7 @@ package io.github.jayhan94.ducklake;
 
 import io.github.jayhan94.ducklake.api.DeleteFile;
 import io.github.jayhan94.ducklake.api.FileFormat;
+import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
 public class DeleteFileImpl implements DeleteFile {
 
@@ -15,7 +16,7 @@ public class DeleteFileImpl implements DeleteFile {
     private final String encryptionKey;
 
     public DeleteFileImpl(
-            Long deleteFileId, 
+            Long deleteFileId,
             Long dataFileId,
             String path,
             FileFormat fileFormat,
@@ -35,7 +36,7 @@ public class DeleteFileImpl implements DeleteFile {
 
     @Override
     public String toString() {
-        return prettyString();
+        return JsonUtils.toJson(this);
     }
 
     @Override

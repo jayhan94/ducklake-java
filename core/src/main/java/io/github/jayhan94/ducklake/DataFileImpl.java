@@ -4,6 +4,7 @@ import io.github.jayhan94.ducklake.api.DataFile;
 import io.github.jayhan94.ducklake.api.DataFileStatistics;
 import io.github.jayhan94.ducklake.api.DeleteFile;
 import io.github.jayhan94.ducklake.api.FileFormat;
+import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
 public class DataFileImpl implements DataFile {
     private final Long dataFileId;
@@ -45,7 +46,7 @@ public class DataFileImpl implements DataFile {
 
     @Override
     public String toString() {
-        return prettyString();
+        return JsonUtils.toJson(this);
     }
 
     @Override

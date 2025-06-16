@@ -6,9 +6,8 @@ import java.util.stream.Collectors;
 
 import io.github.jayhan94.ducklake.api.TableColumn;
 import io.github.jayhan94.ducklake.api.TableSchema;
-import lombok.ToString;
+import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
-@ToString
 public class TableSchemaImpl implements TableSchema, Serializable {
     private final List<TableColumn> columns;
 
@@ -26,5 +25,10 @@ public class TableSchemaImpl implements TableSchema, Serializable {
         return columns.stream()
                 .map(column -> column.columnName() + ":" + column.columnType())
                 .collect(Collectors.joining(", "));
+    }
+
+    @Override
+    public String toString() {
+        return JsonUtils.toJson(this);
     }
 }

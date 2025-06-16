@@ -14,7 +14,7 @@ public final class IntegerTypes {
     }
 
     // Signed integer types
-    public static final class Int8Type implements DataType {
+    public static final class Int8Type extends DataType {
         public static final Int8Type INSTANCE = new Int8Type();
 
         private Int8Type() {
@@ -54,14 +54,9 @@ public final class IntegerTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class Int16Type implements DataType {
+    public static final class Int16Type extends DataType {
         public static final Int16Type INSTANCE = new Int16Type();
 
         private Int16Type() {
@@ -101,14 +96,9 @@ public final class IntegerTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class Int32Type implements DataType {
+    public static final class Int32Type extends DataType {
         public static final Int32Type INSTANCE = new Int32Type();
 
         private Int32Type() {
@@ -148,14 +138,9 @@ public final class IntegerTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class Int64Type implements DataType {
+    public static final class Int64Type extends DataType {
         public static final Int64Type INSTANCE = new Int64Type();
 
         private Int64Type() {
@@ -195,15 +180,10 @@ public final class IntegerTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
     // Unsigned integer types
-    public static final class Uint8Type implements DataType {
+    public static final class Uint8Type extends DataType {
         public static final Uint8Type INSTANCE = new Uint8Type();
 
         private Uint8Type() {
@@ -243,14 +223,9 @@ public final class IntegerTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class Uint16Type implements DataType {
+    public static final class Uint16Type extends DataType {
         public static final Uint16Type INSTANCE = new Uint16Type();
 
         private Uint16Type() {
@@ -290,14 +265,9 @@ public final class IntegerTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class Uint32Type implements DataType {
+    public static final class Uint32Type extends DataType {
         public static final Uint32Type INSTANCE = new Uint32Type();
 
         private Uint32Type() {
@@ -337,14 +307,9 @@ public final class IntegerTypes {
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
         }
-
-        @Override
-        public String toString() {
-            return name();
-        }
     }
 
-    public static final class Uint64Type implements DataType {
+    public static final class Uint64Type extends DataType {
         public static final Uint64Type INSTANCE = new Uint64Type();
 
         private Uint64Type() {
@@ -383,11 +348,6 @@ public final class IntegerTypes {
         @Override
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
-        }
-
-        @Override
-        public String toString() {
-            return name();
         }
     }
 }

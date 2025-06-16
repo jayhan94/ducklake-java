@@ -1,20 +1,27 @@
 package io.github.jayhan94.ducklake.catalog;
 
 import io.github.jayhan94.ducklake.DataFileImpl;
+import io.github.jayhan94.ducklake.DataFileStatisticsImpl;
 import io.github.jayhan94.ducklake.DeleteFileImpl;
+import io.github.jayhan94.ducklake.FileColumnStatisticsImpl;
 import io.github.jayhan94.ducklake.SchemaImpl;
 import io.github.jayhan94.ducklake.SnapshotImpl;
 import io.github.jayhan94.ducklake.TableColumnImpl;
+import io.github.jayhan94.ducklake.TableColumnStatisticsImpl;
 import io.github.jayhan94.ducklake.TableImpl;
 import io.github.jayhan94.ducklake.TableSchemaImpl;
+import io.github.jayhan94.ducklake.TableStatisticsImpl;
 import io.github.jayhan94.ducklake.api.Catalog;
 import io.github.jayhan94.ducklake.api.DataFile;
+import io.github.jayhan94.ducklake.api.DataFileStatistics;
 import io.github.jayhan94.ducklake.api.DeleteFile;
+import io.github.jayhan94.ducklake.api.FileColumnStatistics;
 import io.github.jayhan94.ducklake.api.FileFormat;
 import io.github.jayhan94.ducklake.api.Schema;
 import io.github.jayhan94.ducklake.api.Snapshot;
 import io.github.jayhan94.ducklake.api.Table;
 import io.github.jayhan94.ducklake.api.TableColumn;
+import io.github.jayhan94.ducklake.api.TableColumnStatistics;
 import io.github.jayhan94.ducklake.api.Table.TableIdentifier;
 import io.github.jayhan94.ducklake.api.TableSchema;
 import io.github.jayhan94.ducklake.api.TableStatistics;
@@ -25,9 +32,12 @@ import io.github.jayhan94.ducklake.datatype.StructType;
 import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
 import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
+import io.github.jayhan94.ducklake.entity.DuckLakeFileColumnStatistics;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
+import io.github.jayhan94.ducklake.entity.DuckLakeTableColumnStats;
+import io.github.jayhan94.ducklake.entity.DuckLakeTableStats;
 import lombok.SneakyThrows;
 
 import java.util.ArrayList;
@@ -170,7 +180,8 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
         // Get table information
         DuckLakeTable tableEntity = catalogdb.getTable(snapshotId, schema.schemaId(), tableName);
         if (tableEntity == null) {
-            throw new IllegalArgumentException("Table " + tableIdentifier.toString() + " doesn't exist at snapshot: " + snapshotId);
+            throw new IllegalArgumentException(
+                    "Table " + tableIdentifier.toString() + " doesn't exist at snapshot: " + snapshotId);
         }
 
         long tableId = tableEntity.getTableId();
@@ -275,15 +286,18 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
     }
 
     @Override
-    public TableStatistics getTableStatistics(long snapshotId, long tableId) {
-        // TODO: implement this
-        return null;
-    }
-
-    @Override
     public List<DataFile> getTableDataFiles(long snapshotId, long tableId) {
         List<DuckLakeDataFile> dataFilesEntity = catalogdb.getTableDataFiles(snapshotId, tableId);
         List<DuckLakeDeleteFile> deleteFilesEntity = catalogdb.getTableDeleteFiles(snapshotId, tableId);
+        Map<Long, List<DuckLakeFileColumnStatistics>> dataFileColumnStatisticsEntity = dataFilesEntity.stream()
+                .collect(Collectors.toMap(
+                        DuckLakeDataFile::getDataFileId,
+                        dataFile -> catalogdb.getFileColumnStatistics(tableId, dataFile.getDataFileId()),
+                        (existing, replacement) -> {
+                            throw new IllegalStateException(
+                                    "Each data file should have only one file column statistics, found duplicate data file ID: "
+                                            + existing.get(0).getDataFileId());
+                        }));
         Map<Long, DuckLakeDeleteFile> dataFileToDeleteFile = deleteFilesEntity.stream()
                 .collect(Collectors.toMap(
                         DuckLakeDeleteFile::getDataFileId,
@@ -304,36 +318,76 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
             Long startRowId = dataFileEntity.getRowIdStart();
             Long fileOrder = dataFileEntity.getFileOrder();
 
+            List<FileColumnStatistics> fileColumnStatistics = dataFileColumnStatisticsEntity.get(dataFileId).stream()
+                    .map(fileColStatsEntity -> new FileColumnStatisticsImpl(
+                            fileColStatsEntity.getDataFileId(),
+                            fileColStatsEntity.getTableId(),
+                            fileColStatsEntity.getColumnId(),
+                            fileColStatsEntity.getColumnSizeBytes(),
+                            fileColStatsEntity.getValueCount(),
+                            fileColStatsEntity.getNullCount(),
+                            -1L, // TODO: implement nan count
+                            fileColStatsEntity.getMinValue(),
+                            fileColStatsEntity.getMaxValue(),
+                            fileColStatsEntity.getContainsNaN() != null && fileColStatsEntity.getContainsNaN()))
+                    .collect(Collectors.toList());
+
+            DataFileStatistics dataFileStatistics = new DataFileStatisticsImpl(
+                    rowCount,
+                    fileSizeBytes,
+                    footerSizeBytes,
+                    startRowId,
+                    fileColumnStatistics);
+
             DeleteFile deleteFile = null;
             DuckLakeDeleteFile deleteFileEntity = dataFileToDeleteFile.get(dataFileId);
             if (deleteFileEntity != null) {
                 deleteFile = new DeleteFileImpl(
-                    deleteFileEntity.getDeleteFileId(),
-                    deleteFileEntity.getDataFileId(),
-                    deleteFileEntity.getPath(),
-                    FileFormat.PARQUET,
-                    deleteFileEntity.getDeleteCount(),
-                    deleteFileEntity.getFileSizeBytes(),
-                    deleteFileEntity.getFooterSize(),
-                    deleteFileEntity.getEncryptionKey()
-                );
+                        deleteFileEntity.getDeleteFileId(),
+                        deleteFileEntity.getDataFileId(),
+                        deleteFileEntity.getPath(),
+                        FileFormat.PARQUET,
+                        deleteFileEntity.getDeleteCount(),
+                        deleteFileEntity.getFileSizeBytes(),
+                        deleteFileEntity.getFooterSize(),
+                        deleteFileEntity.getEncryptionKey());
             }
 
             DataFileImpl dataFile = new DataFileImpl(
-                dataFileId,
-                tableId,
-                deleteFile,
-                null,
-                path,
-                FileFormat.valueOf(fileFormat.toUpperCase()),
-                rowCount,
-                fileSizeBytes,
-                footerSizeBytes,
-                startRowId,
-                fileOrder
-            );
+                    dataFileId,
+                    tableId,
+                    deleteFile,
+                    dataFileStatistics,
+                    path,
+                    FileFormat.valueOf(fileFormat.toUpperCase()),
+                    rowCount,
+                    fileSizeBytes,
+                    footerSizeBytes,
+                    startRowId,
+                    fileOrder);
             dataFiles.add(dataFile);
         }
         return dataFiles;
     }
+
+    @Override
+    public TableStatistics getTableStatistics(long snapshotId, long tableId) {
+        List<DuckLakeTableColumnStats> tableColumnStatisticsEntity = catalogdb.getTableColumnStats(snapshotId, tableId);
+        List<TableColumnStatistics> tableColumnStatistics = tableColumnStatisticsEntity.stream()
+                .map(tableColumnStats -> new TableColumnStatisticsImpl(
+                        tableColumnStats.getTableId(),
+                        tableColumnStats.getColumnId(),
+                        tableColumnStats.getContainsNull() != null && tableColumnStats.getContainsNull(),
+                        tableColumnStats.getContainsNan() != null && tableColumnStats.getContainsNan(),
+                        tableColumnStats.getMinValue(),
+                        tableColumnStats.getMaxValue()))
+                .collect(Collectors.toList());
+        DuckLakeTableStats tableStatsEntity = catalogdb.getTableStats(snapshotId, tableId);
+        return new TableStatisticsImpl(
+                tableStatsEntity.getRecordCount(),
+                tableStatsEntity.getFileSizeBytes(),
+                tableStatsEntity.getNextRowId(),
+                tableColumnStatistics);
+    }
+
 }

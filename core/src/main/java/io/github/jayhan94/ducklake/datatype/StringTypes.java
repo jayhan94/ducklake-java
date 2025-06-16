@@ -13,7 +13,7 @@ public final class StringTypes {
         // Utility class
     }
 
-    public static final class VarcharType implements DataType {
+    public static final class VarcharType extends DataType {
         public static final VarcharType INSTANCE = new VarcharType();
 
         private VarcharType() {
@@ -60,7 +60,7 @@ public final class StringTypes {
         }
     }
 
-    public static final class UuidType implements DataType {
+    public static final class UuidType extends DataType {
         public static final UuidType INSTANCE = new UuidType();
 
         private UuidType() {
@@ -99,11 +99,6 @@ public final class StringTypes {
         @Override
         public List<DataType> childrenTypes() {
             return Collections.emptyList();
-        }
-
-        @Override
-        public String toString() {
-            return name();
         }
     }
 }
