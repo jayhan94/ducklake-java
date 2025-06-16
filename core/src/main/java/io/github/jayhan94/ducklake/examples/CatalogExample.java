@@ -38,7 +38,7 @@ public class CatalogExample {
         System.out.println("table id: " + table.tableId());
         System.out.println("table name: " + table.tableName());
         System.out.println("table schema: " + table.tableSchema().prettyString());
-        System.out.println("table data files: " + table.dataFiles().dataFiles().size());
+        System.out.println("table data files: " + table.dataFiles());
         System.out.println("--------------------------------");
         catalog.close();
     }

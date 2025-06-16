@@ -77,5 +77,5 @@ public interface Catalog {
      * @param tableName  table name
      * @return the data files
      */
-    DataFiles getTableDataFiles(long snapshotId, long tableId);
+    List<DataFile> getTableDataFiles(long snapshotId, long tableId);
 }

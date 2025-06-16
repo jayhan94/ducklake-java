@@ -34,6 +34,11 @@ public class DeleteFileImpl implements DeleteFile {
     }
 
     @Override
+    public String toString() {
+        return prettyString();
+    }
+
+    @Override
     public Long deleteFileId() {
         return deleteFileId;
     }

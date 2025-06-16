@@ -1,5 +1,6 @@
 package io.github.jayhan94.ducklake.api;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,7 +13,7 @@ public interface Table {
 
     TableSchema tableSchema();
 
-    DataFiles dataFiles();
+    List<DataFile> dataFiles();
 
     // get the snapshot of the table
     Snapshot snapshot();

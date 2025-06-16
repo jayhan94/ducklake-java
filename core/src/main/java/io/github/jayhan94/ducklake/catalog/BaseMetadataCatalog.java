@@ -1,7 +1,6 @@
 package io.github.jayhan94.ducklake.catalog;
 
 import io.github.jayhan94.ducklake.DataFileImpl;
-import io.github.jayhan94.ducklake.DataFilesImpl;
 import io.github.jayhan94.ducklake.DeleteFileImpl;
 import io.github.jayhan94.ducklake.SchemaImpl;
 import io.github.jayhan94.ducklake.SnapshotImpl;
@@ -10,7 +9,6 @@ import io.github.jayhan94.ducklake.TableImpl;
 import io.github.jayhan94.ducklake.TableSchemaImpl;
 import io.github.jayhan94.ducklake.api.Catalog;
 import io.github.jayhan94.ducklake.api.DataFile;
-import io.github.jayhan94.ducklake.api.DataFiles;
 import io.github.jayhan94.ducklake.api.DeleteFile;
 import io.github.jayhan94.ducklake.api.FileFormat;
 import io.github.jayhan94.ducklake.api.Schema;
@@ -180,7 +178,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
         // Get table columns
         TableSchema tableSchema = getTableSchema(snapshotId, tableId);
 
-        DataFiles dataFiles = getTableDataFiles(snapshotId, tableId);
+        List<DataFile> dataFiles = getTableDataFiles(snapshotId, tableId);
 
         // TODO Get table statistics
         TableStatistics tableStatistics = null;
@@ -283,7 +281,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
     }
 
     @Override
-    public DataFiles getTableDataFiles(long snapshotId, long tableId) {
+    public List<DataFile> getTableDataFiles(long snapshotId, long tableId) {
         List<DuckLakeDataFile> dataFilesEntity = catalogdb.getTableDataFiles(snapshotId, tableId);
         List<DuckLakeDeleteFile> deleteFilesEntity = catalogdb.getTableDeleteFiles(snapshotId, tableId);
         Map<Long, DuckLakeDeleteFile> dataFileToDeleteFile = deleteFilesEntity.stream()
@@ -336,6 +334,6 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
             );
             dataFiles.add(dataFile);
         }
-        return new DataFilesImpl(dataFiles);
+        return dataFiles;
     }
 }

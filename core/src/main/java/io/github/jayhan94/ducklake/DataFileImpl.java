@@ -44,6 +44,11 @@ public class DataFileImpl implements DataFile {
     }
 
     @Override
+    public String toString() {
+        return prettyString();
+    }
+
+    @Override
     public Long dataFileId() {
         return dataFileId;
     }

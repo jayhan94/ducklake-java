@@ -54,3 +54,8 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
+
+task<JavaExec>("runExample") {
+    mainClass.set("io.github.jayhan94.ducklake.examples.CatalogExample")
+    classpath = sourceSets["main"].runtimeClasspath
+}

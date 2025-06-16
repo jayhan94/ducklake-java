@@ -1,5 +1,7 @@
 package io.github.jayhan94.ducklake.api;
 
+import java.util.List;
+
 public interface Scan {
     Scan withSnapshot(long snapshotId);
 
@@ -7,5 +9,5 @@ public interface Scan {
 
     Table table();
 
-    DataFiles dataFiles();
+    List<DataFile> dataFiles();
 }
