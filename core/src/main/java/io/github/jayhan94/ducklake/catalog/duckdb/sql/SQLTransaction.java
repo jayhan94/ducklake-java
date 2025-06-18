@@ -11,6 +11,8 @@ import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
 import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeFileColumnStatistics;
+import io.github.jayhan94.ducklake.entity.DuckLakePartitionInfo;
+import io.github.jayhan94.ducklake.entity.DuckLakePartitionColumn;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
@@ -188,4 +190,35 @@ public interface SQLTransaction {
             WHERE table_id = :tableId
             """)
     DuckLakeTableStats getTableStats(@Bind("tableId") long tableId);
+
+    /**
+     * Get partition information for a specific table at a snapshot
+     * 
+     * @param snapshotId snapshot ID
+     * @param tableId    table ID
+     * @return partition information
+     */
+    @SqlQuery("""
+            SELECT partition_id, table_id, begin_snapshot, end_snapshot
+            FROM ducklake_partition_info
+            WHERE table_id = :tableId
+            AND begin_snapshot <= :snapshotId
+            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
+            """)
+    DuckLakePartitionInfo getPartitionInfo(@Bind("snapshotId") long snapshotId, @Bind("tableId") long tableId);
+
+    /**
+     * Get all partition columns for a specific partition
+     * 
+     * @param partitionId partition ID
+     * @param tableId     table ID
+     * @return list of partition columns
+     */
+    @SqlQuery("""
+            SELECT partition_id, table_id, partition_key_index, column_id, transform
+            FROM ducklake_partition_column
+            WHERE partition_id = :partitionId
+            AND table_id = :tableId
+            """)
+    List<DuckLakePartitionColumn> getPartitionColumns(@Bind("tableId") long tableId, @Bind("partitionId") long partitionId);
 }

@@ -53,11 +53,11 @@ public interface Table {
     Schema schema();
 
     /**
-     * Creates a new scan for this table.
+     * Gets the partition info for this table.
      * 
-     * @return a {@link Scan} builder to configure the scan
+     * @return a {@link PartitionInfo} instance
      */
-    Scan scan();
+    Optional<PartitionInfo> partitionInfo();
 
     /**
      * Gets the statistics for this table.
@@ -65,6 +65,13 @@ public interface Table {
      * @return a {@link TableStatistics} instance
      */
     Optional<TableStatistics> tableStatistics();
+
+    /**
+     * Creates a new scan for this table.
+     * 
+     * @return a {@link Scan} builder to configure the scan
+     */
+    Scan scan();
 
     /**
      * TableIdentifier uniquely identifies a table within a schema

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.github.jayhan94.ducklake.api.DataFile;
+import io.github.jayhan94.ducklake.api.PartitionInfo;
 import io.github.jayhan94.ducklake.api.Scan;
 import io.github.jayhan94.ducklake.api.Schema;
 import io.github.jayhan94.ducklake.api.Snapshot;
@@ -20,6 +21,7 @@ public class TableImpl implements Table, Serializable {
     private final String tableName;
     private final TableSchema tableSchema;
     private final List<DataFile> dataFiles;
+    private final Optional<PartitionInfo> partitionInfo;
     private final Optional<TableStatistics> tableStatistics;
 
     public TableImpl(
@@ -29,6 +31,7 @@ public class TableImpl implements Table, Serializable {
             String tableName,
             TableSchema tableSchema,
             List<DataFile> dataFiles,
+            Optional<PartitionInfo> partitionInfo,
             Optional<TableStatistics> tableStatistics) {
         this.snapshot = snapshot;
         this.schema = schema;
@@ -36,6 +39,7 @@ public class TableImpl implements Table, Serializable {
         this.tableName = tableName;
         this.tableSchema = tableSchema;
         this.dataFiles = dataFiles;
+        this.partitionInfo = partitionInfo;
         this.tableStatistics = tableStatistics;
     }
 
@@ -70,13 +74,18 @@ public class TableImpl implements Table, Serializable {
     }
 
     @Override
-    public Scan scan() {
-        return null;
+    public Optional<PartitionInfo> partitionInfo() {
+        return partitionInfo;
     }
 
     @Override
     public Optional<TableStatistics> tableStatistics() {
         return tableStatistics;
+    }
+
+    @Override
+    public Scan scan() {
+        return null;
     }
 
     @Override

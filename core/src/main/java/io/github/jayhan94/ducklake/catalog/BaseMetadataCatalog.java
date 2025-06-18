@@ -4,6 +4,7 @@ import io.github.jayhan94.ducklake.DataFileImpl;
 import io.github.jayhan94.ducklake.DataFileStatisticsImpl;
 import io.github.jayhan94.ducklake.DeleteFileImpl;
 import io.github.jayhan94.ducklake.FileColumnStatisticsImpl;
+import io.github.jayhan94.ducklake.PartitionInfoImpl;
 import io.github.jayhan94.ducklake.SchemaImpl;
 import io.github.jayhan94.ducklake.SnapshotImpl;
 import io.github.jayhan94.ducklake.TableColumnImpl;
@@ -17,6 +18,8 @@ import io.github.jayhan94.ducklake.api.DataFileStatistics;
 import io.github.jayhan94.ducklake.api.DeleteFile;
 import io.github.jayhan94.ducklake.api.FileColumnStatistics;
 import io.github.jayhan94.ducklake.api.FileFormat;
+import io.github.jayhan94.ducklake.api.PartitionColumn;
+import io.github.jayhan94.ducklake.api.PartitionInfo;
 import io.github.jayhan94.ducklake.api.Schema;
 import io.github.jayhan94.ducklake.api.Snapshot;
 import io.github.jayhan94.ducklake.api.Table;
@@ -33,6 +36,8 @@ import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
 import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeFileColumnStatistics;
+import io.github.jayhan94.ducklake.entity.DuckLakePartitionColumn;
+import io.github.jayhan94.ducklake.entity.DuckLakePartitionInfo;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
@@ -191,12 +196,17 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
         // Get table schema
         TableSchema tableSchema = getTableSchema(snapshotId, tableId);
 
+        // Get table data files
         List<DataFile> dataFiles = getTableDataFiles(snapshotId, tableId);
+
+        // Get table partition info
+        Optional<PartitionInfo> partitionInfo = getTablePartitionInfo(snapshotId, tableId);
 
         // Get table statistics
         Optional<TableStatistics> tableStatistics = getMostRecentTableStatistics(tableId);
 
-        return new TableImpl(snapshot, schema, tableId, tableName, tableSchema, dataFiles, tableStatistics);
+        return new TableImpl(snapshot, schema, tableId, tableName, tableSchema, dataFiles, partitionInfo,
+                tableStatistics);
     }
 
     @Override
@@ -396,6 +406,23 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                 tableStatsEntity.getFileSizeBytes(),
                 tableStatsEntity.getNextRowId(),
                 tableColumnStatistics));
+    }
+
+    private Optional<PartitionInfo> getTablePartitionInfo(long snapshotId, long tableId) {
+        DuckLakePartitionInfo partitionInfoEntity = catalogdb.getPartitionInfo(snapshotId, tableId);
+        if (partitionInfoEntity == null) {
+            return Optional.empty();
+        }
+        List<DuckLakePartitionColumn> partitionColumnsEntities = catalogdb.getPartitionColumns(tableId,
+                partitionInfoEntity.getPartitionId());
+        List<PartitionColumn> partitionColumns = partitionColumnsEntities.stream()
+                .map(partitionColumn -> new PartitionInfoImpl.PartitionColumnImpl(
+                        partitionColumn.getColumnId(),
+                        partitionColumn.getPartitionKeyIndex(),
+                        partitionColumn.getTransform()))
+                .collect(Collectors.toList());
+        return Optional.of(
+                new PartitionInfoImpl(partitionInfoEntity.getPartitionId(), partitionInfoEntity.getTableId(), partitionColumns));
     }
 
 }

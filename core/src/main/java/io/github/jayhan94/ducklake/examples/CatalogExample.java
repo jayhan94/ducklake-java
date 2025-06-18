@@ -1,7 +1,6 @@
 package io.github.jayhan94.ducklake.examples;
 
 import io.github.jayhan94.ducklake.api.Snapshot;
-import io.github.jayhan94.ducklake.api.Table;
 import io.github.jayhan94.ducklake.api.Table.TableIdentifier;
 import io.github.jayhan94.ducklake.catalog.BaseMetadataCatalog;
 import io.github.jayhan94.ducklake.catalog.PostgresMetadataCatalogImpl;
@@ -28,13 +27,10 @@ public class CatalogExample {
         catalog.initialize();
         Snapshot snapshot = catalog.getSnapshot(null);
         System.out.println("--------------------------------");
-        System.out.println("snapshot info");
-        System.out.println("snapshot: " + snapshot);
+        System.out.println("snapshot:\n" + snapshot);
         System.out.println("--------------------------------");
-        System.out.println("table info");
-        Table table = catalog.getTable(snapshot.id(), new TableIdentifier("a"));
-        System.out.println("table: " + table);
+        System.out.println("table:\n" + catalog.getTable(snapshot.id(), new TableIdentifier("a")));
         System.out.println("--------------------------------");
         catalog.close();
-    }
+    }   
 }

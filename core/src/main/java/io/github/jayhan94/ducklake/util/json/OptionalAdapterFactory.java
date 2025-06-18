@@ -20,24 +20,28 @@ public class OptionalAdapterFactory implements TypeAdapterFactory {
 
         final ParameterizedType parameterizedType = (ParameterizedType) typeToken.getType();
         final Type innerType = parameterizedType.getActualTypeArguments()[0];
-        final TypeAdapter<?> delegate = gson.getAdapter(TypeToken.get(innerType));
 
         @SuppressWarnings("unchecked")
-        TypeAdapter<T> result = (TypeAdapter<T>) new OptionalTypeAdapter<>(delegate);
+        TypeAdapter<T> result = (TypeAdapter<T>) new OptionalTypeAdapter<>(gson, innerType);
         return result.nullSafe();
     }
 
     private static class OptionalTypeAdapter<E> extends TypeAdapter<Optional<E>> {
-        private final TypeAdapter<E> delegate;
+        private final Gson gson;
+        private final Type innerType;
 
-        OptionalTypeAdapter(TypeAdapter<E> delegate) {
-            this.delegate = delegate;
+        OptionalTypeAdapter(Gson gson, Type innerType) {
+            this.gson = gson;
+            this.innerType = innerType;
         }
 
         @Override
         public void write(JsonWriter out, Optional<E> value) throws IOException {
             if (value != null && value.isPresent()) {
-                delegate.write(out, value.get());
+                E innerValue = value.get();
+                // Dynamically get the adapter for the actual runtime type of the value
+                TypeAdapter<E> delegate = (TypeAdapter<E>) gson.getAdapter(innerValue.getClass());
+                delegate.write(out, innerValue);
             } else {
                 out.nullValue();
             }
@@ -45,6 +49,9 @@ public class OptionalAdapterFactory implements TypeAdapterFactory {
 
         @Override
         public Optional<E> read(JsonReader in) throws IOException {
+            // Deserialization for interfaces can be complex, but let's provide a basic
+            // implementation.
+            TypeAdapter<E> delegate = (TypeAdapter<E>) gson.getAdapter(TypeToken.get(innerType));
             E value = delegate.read(in);
             return Optional.ofNullable(value);
         }

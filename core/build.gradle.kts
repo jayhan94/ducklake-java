@@ -24,12 +24,12 @@ dependencies {
     implementation("com.google.code.gson:gson:2.13.1")
 
     // duckdb
-    implementation("org.duckdb:duckdb_jdbc:1.3.0.0")
+    implementation(libs.duckdb)
 
     // jdbi
-    implementation("org.jdbi:jdbi3-core:3.49.4")
-    implementation("org.jdbi:jdbi3-jpa:3.49.4")
-    implementation("org.jdbi:jdbi3-sqlobject:3.49.4")
+    implementation(libs.jdbi.core)
+    implementation(libs.jdbi.jpa)
+    implementation(libs.jdbi.sqlobject)
     // connection pool
     implementation("com.zaxxer:HikariCP:6.2.1")
 

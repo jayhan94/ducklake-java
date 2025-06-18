@@ -9,6 +9,8 @@ import io.github.jayhan94.ducklake.entity.DuckLakeColumn;
 import io.github.jayhan94.ducklake.entity.DuckLakeDataFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeDeleteFile;
 import io.github.jayhan94.ducklake.entity.DuckLakeFileColumnStatistics;
+import io.github.jayhan94.ducklake.entity.DuckLakePartitionColumn;
+import io.github.jayhan94.ducklake.entity.DuckLakePartitionInfo;
 import io.github.jayhan94.ducklake.entity.DuckLakeSchema;
 import io.github.jayhan94.ducklake.entity.DuckLakeSnapshot;
 import io.github.jayhan94.ducklake.entity.DuckLakeTable;
@@ -229,5 +231,15 @@ public class CatalogDuckDB implements Closeable, SQLTransaction {
     @Override
     public List<DuckLakeFileColumnStatistics> getFileColumnStatistics(long tableId, long dataFileId) {
         return withTransaction(transaction -> transaction.getFileColumnStatistics(tableId, dataFileId));
+    }
+
+    @Override
+    public DuckLakePartitionInfo getPartitionInfo(long snapshotId, long tableId) {
+        return withTransaction(transaction -> transaction.getPartitionInfo(snapshotId, tableId));
+    }
+
+    @Override
+    public List<DuckLakePartitionColumn> getPartitionColumns(long tableId, long partitionId) {
+        return withTransaction(transaction -> transaction.getPartitionColumns(tableId, partitionId));
     }
 }
