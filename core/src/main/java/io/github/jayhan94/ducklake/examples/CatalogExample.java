@@ -26,11 +26,10 @@ public class CatalogExample {
         // After initializing, the catalog will be ready to use. You can query the metadata tables from the postgres instance.
         catalog.initialize();
         Snapshot snapshot = catalog.getSnapshot(null);
-        System.out.println("--------------------------------");
+        System.out.println("------------snapshot------------");
         System.out.println("snapshot:\n" + snapshot);
-        System.out.println("--------------------------------");
+        System.out.println("-------------table--------------");
         System.out.println("table:\n" + catalog.getTable(snapshot.id(), new TableIdentifier("a")));
-        System.out.println("--------------------------------");
         catalog.close();
-    }   
+    }
 }

@@ -54,6 +54,21 @@ java {
     }
 }
 
+tasks.test {
+    environment("TESTCONTAINERS_RYUK_DISABLED", "true")
+    environment("TESTCONTAINERS_REUSE_ENABLE", "true")
+    
+    jvmArgs("-Dtestcontainers.reuse.enable=true")
+    jvmArgs("-Dtestcontainers.ryuk.container.privileged=true")
+    
+    if (System.getenv("CI") != null) {
+        environment("TESTCONTAINERS_REUSE_ENABLE", "true")
+        environment("TESTCONTAINERS_RYUK_DISABLED", "true")
+    } else {
+        environment("TESTCONTAINERS_REUSE_ENABLE", "true")
+    }
+}
+
 task<JavaExec>("runExample") {
     mainClass.set("io.github.jayhan94.ducklake.examples.CatalogExample")
     classpath = sourceSets["main"].runtimeClasspath
