@@ -28,8 +28,12 @@ public class CatalogExample {
         Snapshot snapshot = catalog.getSnapshot(null);
         System.out.println("------------snapshot------------");
         System.out.println("snapshot:\n" + snapshot);
+        System.out.println("-------------schemas--------------");
+        System.out.println("schemas:\n" + catalog.listSchemas(snapshot.id()));
+        System.out.println("-------------tables--------------");
+        System.out.println("tables:\n" + catalog.listTables(snapshot.id(), "main"));
         System.out.println("-------------table--------------");
-        System.out.println("table:\n" + catalog.getTable(snapshot.id(), new TableIdentifier("a")));
+        System.out.println("table:\n" + catalog.getTable(snapshot.id(), new TableIdentifier("main", "a")));
         catalog.close();
     }
 }

@@ -36,4 +36,11 @@ public class DuckLakeSchema {
 
     @Column(name = "schema_name")
     private String schemaName;
+
+    @Column(name = "path")
+    private String path;
+
+    @Column(name = "path_is_relative")
+    private Boolean pathIsRelative;
+
 }

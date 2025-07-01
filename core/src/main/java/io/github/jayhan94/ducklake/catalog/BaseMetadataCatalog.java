@@ -20,6 +20,7 @@ import io.github.jayhan94.ducklake.api.FileColumnStatistics;
 import io.github.jayhan94.ducklake.api.FileFormat;
 import io.github.jayhan94.ducklake.api.PartitionColumn;
 import io.github.jayhan94.ducklake.api.PartitionInfo;
+import io.github.jayhan94.ducklake.api.PathInfo;
 import io.github.jayhan94.ducklake.api.Schema;
 import io.github.jayhan94.ducklake.api.Snapshot;
 import io.github.jayhan94.ducklake.api.Table;
@@ -162,11 +163,34 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
 
     @Override
     public Schema getSchema(Long snapshotId, String schemaName) {
+        if (schemaName == null) {
+            schemaName = DEFAULT_TABLE_SCHEMA;
+        }
         DuckLakeSchema schemaEntity = catalogdb.getSchema(snapshotId, schemaName);
         if (schemaEntity == null) {
             throw new IllegalArgumentException("Schema doesn't exist: " + schemaName);
         }
-        return new SchemaImpl(schemaEntity.getSchemaId(), schemaEntity.getSchemaName());
+        return new SchemaImpl(schemaEntity.getSchemaId(), schemaEntity.getSchemaName(),
+                new PathInfo(schemaEntity.getPath(), schemaEntity.getPathIsRelative()));
+    }
+
+    @Override
+    public List<Schema> listSchemas(Long snapshotId) {
+        List<DuckLakeSchema> schemasEntity = catalogdb.listSchemas(snapshotId);
+        return schemasEntity.stream()
+                .map(schema -> new SchemaImpl(schema.getSchemaId(), schema.getSchemaName(),
+                        new PathInfo(schema.getPath(), schema.getPathIsRelative())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Table> listTables(Long snapshotId, String schemaName) {
+        Snapshot snapshot = getSnapshot(snapshotId);
+        Schema schema = getSchema(snapshotId, schemaName);
+        List<DuckLakeTable> tablesEntity = catalogdb.listTables(snapshotId, schema.schemaId());
+        return tablesEntity.stream()
+                .map(table -> buildTable(snapshot, schema, table))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -191,7 +215,16 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                     "Table " + tableIdentifier.toString() + " doesn't exist at snapshot: " + snapshotId);
         }
 
+        return buildTable(snapshot, schema, tableEntity);
+    }
+
+    private Table buildTable(Snapshot snapshot, Schema schema, DuckLakeTable tableEntity) {
+        long snapshotId = snapshot.id();
+
         long tableId = tableEntity.getTableId();
+        String tableName = tableEntity.getTableName();
+
+        PathInfo pathInfo = new PathInfo(tableEntity.getPath(), tableEntity.getPathIsRelative());
 
         // Get table schema
         TableSchema tableSchema = getTableSchema(snapshotId, tableId);
@@ -205,14 +238,13 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
         // Get table statistics
         Optional<TableStatistics> tableStatistics = getMostRecentTableStatistics(tableId);
 
-        return new TableImpl(snapshot, schema, tableId, tableName, tableSchema, dataFiles, partitionInfo,
+        return new TableImpl(snapshot, schema, tableId, tableName, tableSchema, pathInfo, dataFiles, partitionInfo,
                 tableStatistics);
     }
 
     @Override
     public Table createTable(String schemaName, TableIdentifier tableIdentifier, TableSchema schema) {
-        // TODO: implement this
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -253,8 +285,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                     DataTypes.parseType(column.getColumnType()),
                     column.getNullsAllowed(),
                     column.getDefaultValue(),
-                    column.getInitialDefault()
-            );
+                    column.getInitialDefault());
         }
 
         // Build complex type based on child columns
@@ -291,8 +322,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                 columnType,
                 column.getNullsAllowed(),
                 column.getDefaultValue(),
-                column.getInitialDefault()
-        );
+                column.getInitialDefault());
     }
 
     private List<DataFile> getTableDataFiles(long snapshotId, long tableId) {
@@ -422,7 +452,8 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
                         partitionColumn.getTransform()))
                 .collect(Collectors.toList());
         return Optional.of(
-                new PartitionInfoImpl(partitionInfoEntity.getPartitionId(), partitionInfoEntity.getTableId(), partitionColumns));
+                new PartitionInfoImpl(partitionInfoEntity.getPartitionId(), partitionInfoEntity.getTableId(),
+                        partitionColumns));
     }
 
 }

@@ -39,4 +39,11 @@ public class DuckLakeTable {
 
     @Column(name = "table_name")
     private String tableName;
+
+    @Column(name = "path")
+    private String path;
+
+    @Column(name = "path_is_relative")
+    private Boolean pathIsRelative;
+
 }

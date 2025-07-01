@@ -17,4 +17,11 @@ public interface Schema {
      * @return the schema name
      */
     String schemaName();
+
+    /**
+     * Gets the path info of the schema.
+     * 
+     * @return the path info
+     */
+    PathInfo pathInfo();
 }

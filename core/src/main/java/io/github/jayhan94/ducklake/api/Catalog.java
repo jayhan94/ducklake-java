@@ -24,12 +24,30 @@ public interface Catalog {
     Snapshot getSnapshot(Long snapshotId);
 
     /**
-     * List all schemas in the catalog at the given snapshot
+     * Get a schema by name and snapshot ID
      * 
-     * @param snapshotId
-     * @return
+     * @param snapshotId snapshot ID
+     * @param schemaName schema name
+     * @return the schema
      */
     Schema getSchema(Long snapshotId, String schemaName);
+
+    /**
+     * List all schemas in the catalog at the given snapshot
+     * 
+     * @param snapshotId snapshot ID
+     * @return list of schemas
+     */
+    List<Schema> listSchemas(Long snapshotId);
+
+    /**
+     * List tables by schema name and snapshot ID
+     * 
+     * @param snapshotId
+     * @param schemaName
+     * @return
+     */
+    List<Table> listTables(Long snapshotId, String schemaName);
 
     /**
      * Get a table by name and snapshot ID

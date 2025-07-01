@@ -52,21 +52,44 @@ public interface SQLTransaction {
      * @return schema information
      */
     @SqlQuery("""
-            SELECT schema_id, schema_name
+            SELECT schema_id, schema_uuid, begin_snapshot, end_snapshot, schema_name, path, path_is_relative
             FROM ducklake_schema
-            WHERE snapshot_id >= begin_snapshot
-                    AND (snapshot_id < end_snapshot OR end_snapshot IS NULL)
+            WHERE begin_snapshot <= :snapshotId
+            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
             """)
     List<DuckLakeSchema> listSchemas(@Bind("snapshotId") long snapshotId);
 
+    /**
+     * Get schema information by schema name and snapshot ID
+     * 
+     * @param snapshotId snapshot ID
+     * @param schemaName schema name
+     * @return schema information
+     */
     @SqlQuery("""
-            SELECT schema_id, schema_name
+            SELECT schema_id, schema_uuid, begin_snapshot, end_snapshot, schema_name, path, path_is_relative
             FROM ducklake_schema
             WHERE schema_name = :schemaName
             AND begin_snapshot <= :snapshotId
             AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
             """)
     DuckLakeSchema getSchema(@Bind("snapshotId") long snapshotId, @Bind("schemaName") String schemaName);
+
+    /**
+     * List tables by schema name and snapshot ID
+     * 
+     * @param snapshotId snapshot ID
+     * @param schemaId   schema ID
+     * @return list of tables
+     */
+    @SqlQuery("""
+            SELECT table_id, table_uuid, begin_snapshot, end_snapshot, schema_id, table_name, path, path_is_relative
+            FROM ducklake_table
+            WHERE schema_id = :schemaId
+            AND begin_snapshot <= :snapshotId
+            AND (end_snapshot > :snapshotId OR end_snapshot IS NULL)
+            """)
+    List<DuckLakeTable> listTables(@Bind("snapshotId") long snapshotId, @Bind("schemaId") long schemaId);
 
     /**
      * Get table information by table name and snapshot ID
@@ -76,7 +99,7 @@ public interface SQLTransaction {
      * @return table information
      */
     @SqlQuery("""
-            SELECT table_id, table_uuid, begin_snapshot, end_snapshot, schema_id, table_name
+            SELECT table_id, table_uuid, begin_snapshot, end_snapshot, schema_id, table_name, path, path_is_relative
             FROM ducklake_table
             WHERE table_name = :tableName
             AND begin_snapshot <= :snapshotId
@@ -94,8 +117,8 @@ public interface SQLTransaction {
      * @return The created DuckLakeTable object
      */
     @SqlUpdate("""
-            INSERT INTO ducklake_table(table_id, table_uuid, begin_snapshot, end_snapshot, schema_id, table_name)
-            VALUES (:tableId, :tableUuid, :beginSnapshot, :endSnapshot, :schemaId, :tableName)
+            INSERT INTO ducklake_table(table_id, table_uuid, begin_snapshot, end_snapshot, schema_id, table_name, path, path_is_relative)
+            VALUES (:tableId, :tableUuid, :beginSnapshot, :endSnapshot, :schemaId, :tableName, :path, :pathIsRelative)
             """)
     boolean createTable(@BindBean DuckLakeTable duckLakeTable);
 

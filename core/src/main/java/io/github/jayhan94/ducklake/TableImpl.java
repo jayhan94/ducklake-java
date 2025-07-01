@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import io.github.jayhan94.ducklake.api.DataFile;
 import io.github.jayhan94.ducklake.api.PartitionInfo;
+import io.github.jayhan94.ducklake.api.PathInfo;
 import io.github.jayhan94.ducklake.api.Scan;
 import io.github.jayhan94.ducklake.api.Schema;
 import io.github.jayhan94.ducklake.api.Snapshot;
@@ -15,11 +16,12 @@ import io.github.jayhan94.ducklake.api.TableStatistics;
 import io.github.jayhan94.ducklake.util.json.JsonUtils;
 
 public class TableImpl implements Table, Serializable {
-    private transient final Snapshot snapshot;
-    private transient final Schema schema;
+    private final Snapshot snapshot;
+    private final Schema schema;
     private final long tableId;
     private final String tableName;
     private final TableSchema tableSchema;
+    private final PathInfo pathInfo;
     private final List<DataFile> dataFiles;
     private final Optional<PartitionInfo> partitionInfo;
     private final Optional<TableStatistics> tableStatistics;
@@ -30,6 +32,7 @@ public class TableImpl implements Table, Serializable {
             long tableId,
             String tableName,
             TableSchema tableSchema,
+            PathInfo pathInfo,
             List<DataFile> dataFiles,
             Optional<PartitionInfo> partitionInfo,
             Optional<TableStatistics> tableStatistics) {
@@ -38,6 +41,7 @@ public class TableImpl implements Table, Serializable {
         this.tableId = tableId;
         this.tableName = tableName;
         this.tableSchema = tableSchema;
+        this.pathInfo = pathInfo;
         this.dataFiles = dataFiles;
         this.partitionInfo = partitionInfo;
         this.tableStatistics = tableStatistics;
@@ -56,6 +60,11 @@ public class TableImpl implements Table, Serializable {
     @Override
     public TableSchema tableSchema() {
         return tableSchema;
+    }
+
+    @Override
+    public PathInfo pathInfo() {
+        return pathInfo;
     }
 
     @Override

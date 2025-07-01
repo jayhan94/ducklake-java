@@ -32,6 +32,13 @@ public interface Table {
     TableSchema tableSchema();
 
     /**
+     * Gets the path info of the table.
+     * 
+     * @return the path info
+     */
+    PathInfo pathInfo();
+
+    /**
      * Gets the list of data files for the current snapshot of the table.
      * 
      * @return a list of {@link DataFile}

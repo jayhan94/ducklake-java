@@ -194,6 +194,11 @@ public class CatalogDuckDB implements Closeable, SQLTransaction {
     }
 
     @Override
+    public List<DuckLakeTable> listTables(long snapshotId, long schemaId) {
+        return withTransaction(transaction -> transaction.listTables(snapshotId, schemaId));
+    }
+
+    @Override
     public DuckLakeTable getTable(long snapshotId, long schemaId, String tableName) {
         return withTransaction(transaction -> transaction.getTable(snapshotId, schemaId, tableName));
     }
