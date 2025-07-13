@@ -19,14 +19,20 @@ dependencies {
 
     // Spark dependencies should be provided by the execution environment
     compileOnly("org.apache.spark:spark-sql_${scalaBinVersion}:${sparkVersion}")
-    compileOnly("org.apache.spark:spark-core_${scalaBinVersion}:${sparkVersion}")
-    
-    // Test dependencies
-    testImplementation(libs.junit)
+
+    // JUnit Jupiter (JUnit 5) test dependencies
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation("org.apache.spark:spark-sql_${scalaBinVersion}:${sparkVersion}")
 }
 
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

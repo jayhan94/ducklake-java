@@ -38,8 +38,13 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    // tests
-    testImplementation(libs.junit)
+    // JUnit Jupiter (JUnit 5) test dependencies
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    
+    // TestContainers and database drivers
     testImplementation("org.postgresql:postgresql:42.7.3")
     testImplementation("org.testcontainers:postgresql:1.19.8")
     testImplementation("com.mysql:mysql-connector-j:9.3.0")
@@ -55,12 +60,17 @@ java {
 }
 
 tasks.test {
+    // Use JUnit Platform for running tests
+    useJUnitPlatform()
+    
+    // TestContainers configuration
     environment("TESTCONTAINERS_RYUK_DISABLED", "true")
     environment("TESTCONTAINERS_REUSE_ENABLE", "true")
     
     jvmArgs("-Dtestcontainers.reuse.enable=true")
     jvmArgs("-Dtestcontainers.ryuk.container.privileged=true")
     
+    // CI environment specific configuration
     if (System.getenv("CI") != null) {
         environment("TESTCONTAINERS_REUSE_ENABLE", "true")
         environment("TESTCONTAINERS_RYUK_DISABLED", "true")

@@ -2,8 +2,8 @@ package io.github.jayhan94.ducklake.catalog;
 
 public class DuckDBMetadataCatalogImpl extends BaseMetadataCatalog {
 
-    public DuckDBMetadataCatalogImpl(String catalogName, String address) {
-        super(catalogName, address, null, null, null, null);
+    public DuckDBMetadataCatalogImpl(String database, String address) {
+        super(database, address, null, null, null, null);
     }
 
     @Override
@@ -13,6 +13,6 @@ public class DuckDBMetadataCatalogImpl extends BaseMetadataCatalog {
 
     @Override
     protected void attach() {
-        execute(String.format("ATTACH 'ducklake:%s' AS %s;", address, catalogName));
+        execute(String.format("ATTACH 'ducklake:%s' AS %s;", address, database));
     }
 }

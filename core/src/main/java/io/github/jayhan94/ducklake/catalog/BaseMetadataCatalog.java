@@ -64,8 +64,8 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
     private static final String CATALOG_DATABASE_PREFIX = "__ducklake_metadata_";
     public static final String DEFAULT_TABLE_SCHEMA = "main";
 
-    protected String catalogName;
-    protected String catalogDatabase;
+    protected String database;
+    protected String metadataDB;
     protected String address;
     protected Integer port;
     protected String username;
@@ -74,14 +74,14 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
     protected CatalogDuckDB catalogdb;
 
     public BaseMetadataCatalog(
-            String catalogName,
+            String database,
             String address,
             Integer port,
             String username,
             String password,
             String dataPath) {
-        this.catalogName = catalogName;
-        this.catalogDatabase = CATALOG_DATABASE_PREFIX + catalogName;
+        this.database = database;
+        this.metadataDB = CATALOG_DATABASE_PREFIX + database;
         this.address = address;
         this.port = port;
         this.username = username;
@@ -123,7 +123,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
     protected abstract void attach();
 
     private void useCatalogDatabase() {
-        execute(String.format("USE %s", catalogDatabase));
+        execute(String.format("USE %s", metadataDB));
     }
 
     public void initialize() {
@@ -131,7 +131,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
         installPlugins();
         attach();
         useCatalogDatabase();
-        logger.info("DuckLake catalog '{}' initialized successfully", catalogName);
+        logger.info("DuckLake catalog '{}' initialized successfully", database);
     }
 
     @Override
@@ -139,7 +139,7 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
     public void close() {
         if (catalogdb != null && !catalogdb.isClosed()) {
             catalogdb.close();
-            logger.info("DuckDB connection closed for catalog: {}", catalogName);
+            logger.info("DuckDB connection closed for catalog: {}", database);
         }
     }
 
@@ -165,6 +165,9 @@ public abstract class BaseMetadataCatalog implements AutoCloseable, Catalog {
     public Schema getSchema(Long snapshotId, String schemaName) {
         if (schemaName == null) {
             schemaName = DEFAULT_TABLE_SCHEMA;
+        }
+        if (snapshotId == null) {
+            snapshotId = catalogdb.getLatestSnapshot().getSnapshotId();
         }
         DuckLakeSchema schemaEntity = catalogdb.getSchema(snapshotId, schemaName);
         if (schemaEntity == null) {
